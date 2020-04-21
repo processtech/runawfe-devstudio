@@ -41,13 +41,13 @@ import ru.runa.gpd.lang.model.ProcessDefinition;
 
 public abstract class EditorPartBase<T> extends EditorPart implements PropertyChangeListener {
 
-    protected final ProcessEditorBase editor;
+    protected final EditorBase editor;
 
     private Menu menu;
     private FormToolkit toolkit;
     private TableViewer mainViewer;
 
-    public EditorPartBase(ProcessEditorBase editor) {
+    public EditorPartBase(EditorBase editor) {
         this.editor = editor;
     }
 

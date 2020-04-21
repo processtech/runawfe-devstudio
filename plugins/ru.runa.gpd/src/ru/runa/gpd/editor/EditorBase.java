@@ -59,15 +59,18 @@ import ru.runa.gpd.util.EditorUtils;
 import ru.runa.gpd.util.IOUtils;
 import ru.runa.gpd.util.WorkspaceOperations;
 
-public abstract class ProcessEditorBase extends EditorBase {
-	protected TextEditor sourcePage;
-    protected GraphicalEditor graphPage;
-    protected OutlineViewer outlineViewer;
-    
+public abstract class EditorBase extends MultiPageEditorPart implements ISelectionListener, IResourceChangeListener, PropertyChangeListener {
+
+    protected ProcessDefinition definition;
+    protected IFile definitionFile;
+    protected SwimlaneEditorPage swimlanePage;
+    protected VariableEditorPage variablePage;
+    protected VariableTypeEditorPage variableTypeEditorPage;
+
     @Override
     public void init(IEditorSite site, IEditorInput input) throws PartInitException {
         super.init(site, input);
-        /*
+
         getSite().getPage().addSelectionListener(this);
         ResourcesPlugin.getWorkspace().addResourceChangeListener(this, IResourceChangeEvent.POST_CHANGE);
 
@@ -76,7 +79,7 @@ public abstract class ProcessEditorBase extends EditorBase {
         definition.setDirty(false);
         definition.addPropertyChangeListener(this);
 
-        setPartName(definition.getName());*/
+        setPartName(definition.getName());
     }
 
     @Override
@@ -110,49 +113,8 @@ public abstract class ProcessEditorBase extends EditorBase {
     }
 
     @Override
-    public void selectionChanged(IWorkbenchPart part, ISelection selection) {
-        try {
-            if (!(selection instanceof IStructuredSelection)) {
-                return;
-            }
-            IStructuredSelection structuredSelection = (IStructuredSelection) selection;
-            Object selectedObject = structuredSelection.getFirstElement();
-            if (selectedObject == null) {
-                return;
-            }
-            if (part instanceof GEFProcessEditor) {
-                // select only variables and swimlanes
-                if (selectedObject instanceof Swimlane || selectedObject instanceof Variable) {
-                    selectGraphElement((GraphElement) selectedObject);
-                }
-            }
-            if (part instanceof ContentOutline) {
-                Object model = ((EditPart) selectedObject).getModel();
-                if (!(model instanceof GraphElement)) {
-                    return;
-                }
-                select((GraphElement) model);
-            }
-            String activateViewId = null;
-            if (selectedObject instanceof ElementGraphicalEditPart) {
-                activateViewId = ((ElementGraphicalEditPart) selectedObject).getAssociatedViewId();
-            }
-            if (activateViewId != null) {
-                IViewPart viewPart = getSite().getPage().findView(activateViewId);
-                if (!getSite().getPage().isPartVisible(viewPart)) {
-                    try {
-                        getSite().getPage().showView(activateViewId, null, IWorkbenchPage.VIEW_VISIBLE);
-                    } catch (Exception e) {
-                    }
-                }
-            }
-        } catch (Exception e) {
-            PluginLogger.logErrorWithoutDialog("DesignerEditor.selectionChanged", e);
-        }
-    }
-
-    @Override
     protected void createPages() {
+    	/*
         try {
             graphPage = addNewPage(createGraphPage(), "DesignerEditor.title.diagram");
             if (!(definition instanceof SubprocessDefinition)) {
@@ -165,10 +127,11 @@ public abstract class ProcessEditorBase extends EditorBase {
         } catch (PartInitException e) {
             PluginLogger.logError(Localization.getString("DesignerEditor.error.can_not_create_graphical_viewer"), e);
             throw new RuntimeException(e);
-        }
+        }*/
     }
 
     public void select(GraphElement model) {
+    	/*
         if (model instanceof Swimlane && swimlanePage != null) {
             openPage(1);
             swimlanePage.select((Swimlane) model);
@@ -178,41 +141,12 @@ public abstract class ProcessEditorBase extends EditorBase {
         } else {
             openPage(0);
             selectGraphElement(model);
-        }
+        }*/
     }
 
     @Override
     public Object getAdapter(Class adapter) {
-        if (adapter == IContentOutlinePage.class) {
-            return getOutlineViewer();
-        }
-        if (adapter == ActionRegistry.class) {
-            return graphPage.getAdapter(adapter);
-        }
         return super.getAdapter(adapter);
-    }
-
-    public IFigure getRootFigure() {
-        return (IFigure) graphPage.getAdapter(IFigure.class);
-    }
-
-    public GraphicalViewer getGraphicalViewer() {
-        return (GraphicalViewer) graphPage.getAdapter(GraphicalViewer.class);
-    }
-
-    public CommandStack getCommandStack() {
-        return (CommandStack) graphPage.getAdapter(CommandStack.class);
-    }
-
-    public EditDomain getEditDomain() {
-        return getGraphicalViewer().getEditDomain();
-    }
-
-    public OutlineViewer getOutlineViewer() {
-        if (outlineViewer == null && getGraphicalViewer() != null) {
-            outlineViewer = new OutlineViewer(this);
-        }
-        return outlineViewer;
     }
 
     public void openPage(int number) {
@@ -222,35 +156,15 @@ public abstract class ProcessEditorBase extends EditorBase {
         }
     }
 
-    public void refresh() {
-        IFigure figure = getRootFigure();
-        figure.revalidate();
-        figure.repaint();
-        figure.invalidateTree();
-    }
-
     public ProcessDefinition getDefinition() {
         return definition;
     }
 
     @Override
-    public void propertyChange(PropertyChangeEvent evt) {
-        if (PropertyNames.PROPERTY_DIRTY.equals(evt.getPropertyName())) {
-            firePropertyChange(IEditorPart.PROP_DIRTY);
-        }
-        if (PropertyNames.PROPERTY_SHOW_GRID.equals(evt.getPropertyName())) {
-            updateGridLayerVisibility(definition.isShowGrid());
-        }
-    }
-
-    @Override
     public void doSave(IProgressMonitor monitor) {
-        graphPage.doSave(monitor);
-        GEFImageHelper.save(getGraphicalViewer(), definition, getGraphImagePath());
         try {
             ProcessDefinitionValidator.validateDefinition(definition);
             WorkspaceOperations.saveProcessDefinition(definition);
-            getCommandStack().markSaveLocation();
             definition.setDirty(false);
             ProcessSaveHistory.addSavepoint(definitionFile);
         } catch (Exception e) {
@@ -304,23 +218,13 @@ public abstract class ProcessEditorBase extends EditorBase {
 
     @Override
     public boolean isDirty() {
-        return graphPage.isDirty() || definition.isDirty();
+        return definition.isDirty();
     }
 
     @Override
     public boolean isSaveOnCloseNeeded() {
         return isDirty();
     }
-
-    public DiagramEditorPage getDiagramEditorPage() {
-        return graphPage instanceof DiagramEditorPage ? (DiagramEditorPage) graphPage : null;
-    }
-
-    protected abstract GraphicalEditor createGraphPage();
-
-    protected abstract void selectGraphElement(GraphElement model);
-
-    protected abstract void updateGridLayerVisibility(boolean enabled);
 
     @Override
     protected void pageChange(int newPageIndex) {

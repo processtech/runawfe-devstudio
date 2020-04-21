@@ -29,6 +29,7 @@ import ru.runa.gpd.validation.ValidatorParser;
 
 public class ParContentProvider {
     public static final String PROCESS_DEFINITION_FILE_NAME = "processdefinition.xml";
+    public static final String GLOBAL_SECTION_DEFINITION_FILE_NAME = "globalsectiondefinition.xml";
     public static final String SUBPROCESS_DEFINITION_PREFIX = "sub";
     public static final String PROCESS_DEFINITION_DESCRIPTION_FILE_NAME = "index.html";
     public static final String FORM_CSS_FILE_NAME = "form.css";

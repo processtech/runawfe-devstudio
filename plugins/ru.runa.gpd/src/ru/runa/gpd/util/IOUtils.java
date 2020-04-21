@@ -544,9 +544,17 @@ public class IOUtils {
     public static boolean isProcessDefinitionFolder(IFolder folder) {
         return getProcessDefinitionFile(folder).exists();
     }
+    
+    public static boolean isGlobalSectionDefinitionFolder(IFolder folder) {
+        return getGlobalSectionDefinitionFile(folder).exists();
+    }
 
     public static IFile getProcessDefinitionFile(IFolder folder) {
         return getFile(folder, ParContentProvider.PROCESS_DEFINITION_FILE_NAME);
+    }
+    
+    public static IFile getGlobalSectionDefinitionFile(IFolder folder) {
+        return getFile(folder, ParContentProvider.GLOBAL_SECTION_DEFINITION_FILE_NAME);
     }
 
     public static IFile getSubprocessDefinitionFile(IFolder folder, SubprocessDefinition definition) {

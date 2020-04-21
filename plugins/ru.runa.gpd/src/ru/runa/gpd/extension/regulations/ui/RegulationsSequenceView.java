@@ -29,7 +29,7 @@ import ru.runa.gpd.Localization;
 import ru.runa.gpd.PluginConstants;
 import ru.runa.gpd.PluginLogger;
 import ru.runa.gpd.SharedImages;
-import ru.runa.gpd.editor.ProcessEditorBase;
+import ru.runa.gpd.editor.EditorBase;
 import ru.runa.gpd.lang.model.GraphElement;
 import ru.runa.gpd.lang.model.ProcessDefinition;
 import ru.runa.gpd.util.UiUtil;
@@ -101,7 +101,7 @@ public class RegulationsSequenceView extends ViewPart implements ISelectionChang
         }
         try {
             IFile definitionFile = (IFile) marker.getResource();
-            ProcessEditorBase editor = WorkspaceOperations.openProcessDefinition(definitionFile);
+            EditorBase editor = WorkspaceOperations.openProcessDefinition(definitionFile);
             String elementId = marker.getAttribute(PluginConstants.SELECTION_LINK_KEY, null);
             GraphElement graphElement = editor.getDefinition().getGraphElementById(elementId);
             if (graphElement != null) {

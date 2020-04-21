@@ -18,7 +18,7 @@ import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.texteditor.ITextEditor;
 import ru.runa.gpd.PluginLogger;
 import ru.runa.gpd.editor.BotTaskEditor;
-import ru.runa.gpd.editor.ProcessEditorBase;
+import ru.runa.gpd.editor.EditorBase;
 import ru.runa.gpd.form.FormTypeProvider;
 import ru.runa.gpd.lang.model.FormNode;
 import ru.runa.gpd.lang.model.TaskState;
@@ -95,7 +95,7 @@ public class SearchPage extends AbstractTextSearchViewPage {
         } else if (ElementMatch.CONTEXT_BOT_TASK.equals(elementMatch.getContext())) {
             IDE.openEditor(getSite().getPage(), elementMatch.getFile(), BotTaskEditor.ID);
         } else if (ElementMatch.CONTEXT_PROCESS_DEFINITION.equals(elementMatch.getContext())) {
-            ProcessEditorBase processEditor = WorkspaceOperations.openProcessDefinition(elementMatch.getFile());
+            EditorBase processEditor = WorkspaceOperations.openProcessDefinition(elementMatch.getFile());
             if (processEditor != null) {
                 processEditor.select(elementMatch.getGraphElement());
             }
@@ -108,7 +108,7 @@ public class SearchPage extends AbstractTextSearchViewPage {
             // delegable.setDelegationConfiguration(newConfig);
             // }
         } else if (elementMatch.getGraphElement() != null) {
-            ProcessEditorBase processEditor = WorkspaceOperations.openProcessDefinition(elementMatch.getFile());
+        	EditorBase processEditor = WorkspaceOperations.openProcessDefinition(elementMatch.getFile());
             if (processEditor != null) {
                 processEditor.select(elementMatch.getGraphElement());
             }

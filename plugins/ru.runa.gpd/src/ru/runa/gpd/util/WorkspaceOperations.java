@@ -49,10 +49,13 @@ import ru.runa.gpd.PluginLogger;
 import ru.runa.gpd.ProcessCache;
 import ru.runa.gpd.SubprocessMap;
 import ru.runa.gpd.editor.BotTaskEditor;
+import ru.runa.gpd.editor.EditorBase;
 import ru.runa.gpd.editor.ProcessEditorBase;
+import ru.runa.gpd.editor.GlobalSectionEditorBase;
 import ru.runa.gpd.editor.ProcessSaveHistory;
 import ru.runa.gpd.editor.gef.GEFProcessEditor;
 import ru.runa.gpd.editor.graphiti.GraphitiProcessEditor;
+import ru.runa.gpd.editor.graphiti.GraphitiGlobalSectionEditor;
 import ru.runa.gpd.extension.DelegableProvider;
 import ru.runa.gpd.extension.HandlerRegistry;
 import ru.runa.gpd.extension.bot.IBotFileSupportProvider;
@@ -79,15 +82,18 @@ import ru.runa.gpd.ui.wizard.ExportBotElementWizardPage;
 import ru.runa.gpd.ui.wizard.ExportBotWizard;
 import ru.runa.gpd.ui.wizard.ExportDataSourceWizard;
 import ru.runa.gpd.ui.wizard.ExportParWizard;
+import ru.runa.gpd.ui.wizard.ExportGlbWizard;
 import ru.runa.gpd.ui.wizard.ImportBotElementWizardPage;
 import ru.runa.gpd.ui.wizard.ImportBotWizard;
 import ru.runa.gpd.ui.wizard.ImportDataSourceWizard;
 import ru.runa.gpd.ui.wizard.ImportParWizard;
+import ru.runa.gpd.ui.wizard.ImportGlbWizard;
 import ru.runa.gpd.ui.wizard.NewBotStationWizard;
 import ru.runa.gpd.ui.wizard.NewBotTaskWizard;
 import ru.runa.gpd.ui.wizard.NewBotWizard;
 import ru.runa.gpd.ui.wizard.NewFolderWizard;
 import ru.runa.gpd.ui.wizard.NewProcessDefinitionWizard;
+import ru.runa.gpd.ui.wizard.NewGlobalSectionDefinitionWizard;
 import ru.runa.gpd.ui.wizard.NewProcessProjectWizard;
 import ru.runa.wfe.InternalApplicationException;
 import ru.runa.wfe.datasource.DataSourceStuff;
@@ -221,6 +227,16 @@ public class WorkspaceOperations {
         return null;
     }
 
+    public static ProcessDefinition createNewGlobalSectionDefinition(IStructuredSelection selection, ProcessDefinitionAccessType accessType) {
+        NewGlobalSectionDefinitionWizard wizard = new NewGlobalSectionDefinitionWizard(accessType);
+        wizard.init(PlatformUI.getWorkbench(), selection);
+        WizardDialog dialog = new WizardDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), wizard);
+        if (dialog.open() == Window.OK) {
+            return ProcessCache.getProcessDefinition(wizard.getDefinitionFile());
+        }
+        return null;
+    }
+    
     public static void copyProcessDefinition(IStructuredSelection selection) {
         IFolder processDefinitionFolder = (IFolder) selection.getFirstElement();
         IDE.saveAllEditors(new IResource[] { processDefinitionFolder }, true);
@@ -344,7 +360,7 @@ public class WorkspaceOperations {
         definition.getFile().setContents(new ByteArrayInputStream(bytes), true, false, null);
     }
 
-    public static ProcessEditorBase openProcessDefinition(IFile definitionFile) {
+    public static EditorBase openProcessDefinition(IFile definitionFile) {
         try {
             ProcessDefinition processDefinition = ProcessCache.getProcessDefinition(definitionFile);
             String editorId;
@@ -364,6 +380,26 @@ public class WorkspaceOperations {
         return null;
     }
 
+    public static EditorBase openGlobalSectionDefinition(IFile definitionFile) {
+        try {
+            ProcessDefinition processDefinition = ProcessCache.getProcessDefinition(definitionFile);
+            String editorId;
+            if (processDefinition.getLanguage() == Language.BPMN) {
+                editorId = GraphitiGlobalSectionEditor.ID;
+            } else {
+                editorId = GEFProcessEditor.ID;
+            }
+            IEditorPart editorPart = IDE.openEditor(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage(), definitionFile, editorId,
+                    true);
+            if (editorPart instanceof GlobalSectionEditorBase) {
+                return (GlobalSectionEditorBase) editorPart;
+            }
+        } catch (PartInitException e) {
+            PluginLogger.logError("Unable open diagram", e);
+        }
+        return null;
+    }
+    
     /**
      * @return process editor or <code>null</code>
      */
@@ -408,6 +444,20 @@ public class WorkspaceOperations {
         dialog.open();
     }
 
+    public static void exportGlobalSectionDefinition(IStructuredSelection selection) {
+        ExportGlbWizard wizard = new ExportGlbWizard();
+        wizard.init(PlatformUI.getWorkbench(), selection);
+        CompactWizardDialog dialog = new CompactWizardDialog(wizard);
+        dialog.open();
+    }
+
+    public static void importGlobalSectionDefinition(IStructuredSelection selection) {
+        ImportGlbWizard wizard = new ImportGlbWizard();
+        wizard.init(PlatformUI.getWorkbench(), selection);
+        CompactWizardDialog dialog = new CompactWizardDialog(wizard);
+        dialog.open();
+    }
+    
     public static void showProcessSaveHistory(IStructuredSelection selection) {
         new ProcessSaveHistoryDialog((IFolder) selection.getFirstElement()).open();
     }

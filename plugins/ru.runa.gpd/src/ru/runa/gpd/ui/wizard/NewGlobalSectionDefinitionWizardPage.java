@@ -28,7 +28,7 @@ import ru.runa.gpd.ui.custom.FileNameChecker;
 import ru.runa.gpd.util.IOUtils;
 import ru.runa.gpd.util.SwimlaneDisplayMode;
 
-public class NewProcessDefinitionWizardPage extends WizardPage {
+public class NewGlobalSectionDefinitionWizardPage extends WizardPage {
     private Combo projectCombo;
     private Text processText;
     private Combo languageCombo;
@@ -38,10 +38,10 @@ public class NewProcessDefinitionWizardPage extends WizardPage {
     private final List<IContainer> processContainers;
     private final ProcessDefinition parentProcessDefinition;
 
-    public NewProcessDefinitionWizardPage(IStructuredSelection selection, ProcessDefinition parentProcessDefinition) {
+    public NewGlobalSectionDefinitionWizardPage(IStructuredSelection selection, ProcessDefinition parentProcessDefinition) {
         super(Localization.getString("NewProcessDefinitionWizardPage.page.name"));
-        setTitle(Localization.getString("NewProcessDefinitionWizardPage.page.title"));
-        setDescription(Localization.getString("NewProcessDefinitionWizardPage.page.description"));
+        setTitle(Localization.getString("NewGlobalSectionDefinitionWizardPage.page.title"));
+        setDescription(Localization.getString("NewGlobalSectionWizardPage.page.description"));
         this.initialSelection = (IContainer) IOUtils.getProcessSelectionResource(selection);
         this.processContainers = IOUtils.getAllProcessContainers();
         this.parentProcessDefinition = parentProcessDefinition;
@@ -92,7 +92,7 @@ public class NewProcessDefinitionWizardPage extends WizardPage {
 
     private void createProcessNameField(Composite parent) {
         Label label = new Label(parent, SWT.NONE);
-        label.setText(Localization.getString("label.process_name"));
+        label.setText(Localization.getString("label.section_name"));
         processText = new Text(parent, SWT.BORDER);
         processText.addModifyListener(new ModifyListener() {
             @Override
@@ -127,6 +127,8 @@ public class NewProcessDefinitionWizardPage extends WizardPage {
             languageCombo.setText(parentProcessDefinition.getLanguage().name());
             languageCombo.setEnabled(false);
         }
+        label.setVisible(false);
+        languageCombo.setVisible(false);
     }
 
     private void createBpmnDisplaySwimlaneCombo(Composite parent) {
@@ -142,6 +144,8 @@ public class NewProcessDefinitionWizardPage extends WizardPage {
             bpmnDisplaySwimlaneCombo.setText(SwimlaneDisplayMode.none.getLabel());
             bpmnDisplaySwimlaneCombo.setEnabled(false);
         }
+        label.setVisible(false);
+        bpmnDisplaySwimlaneCombo.setVisible(false);
     }
 
     private void createCssTemplateCombo(Composite parent) {
@@ -159,6 +163,8 @@ public class NewProcessDefinitionWizardPage extends WizardPage {
             }
         }
         cssTemplateCombo.select(0);
+        label.setVisible(false);
+        cssTemplateCombo.setVisible(false);
     }
 
     private void verifyContentsValid() {
@@ -170,9 +176,6 @@ public class NewProcessDefinitionWizardPage extends WizardPage {
             setPageComplete(false);
         } else if (!FileNameChecker.isValid(processText.getText())) {
             setErrorMessage(Localization.getString("error.process_name_not_valid"));
-            setPageComplete(false);
-        } else if (FileNameChecker.firstSymbolIsDot(processText.getText())) {
-            setErrorMessage(Localization.getString("error.process_name_begins_with_dot"));
             setPageComplete(false);
         } else if (isProcessExists()) {
             setErrorMessage(Localization.getString("error.process_already_exists"));

@@ -33,7 +33,7 @@ import ru.runa.gpd.Localization;
 import ru.runa.gpd.PluginConstants;
 import ru.runa.gpd.PluginLogger;
 import ru.runa.gpd.SharedImages;
-import ru.runa.gpd.editor.ProcessEditorBase;
+import ru.runa.gpd.editor.EditorBase;
 import ru.runa.gpd.lang.ValidationErrorDetails;
 import ru.runa.gpd.lang.model.Action;
 import ru.runa.gpd.lang.model.GraphElement;
@@ -95,7 +95,7 @@ public class ValidationErrorsView extends ViewPart implements ISelectionChangedL
         }
         try {
             IFile definitionFile = (IFile) marker.getResource();
-            ProcessEditorBase editor = WorkspaceOperations.openProcessDefinition(definitionFile);
+            EditorBase editor = WorkspaceOperations.openProcessDefinition(definitionFile);
             GraphElement graphElement = null;
             String elementId = marker.getAttribute(PluginConstants.SELECTION_LINK_KEY, null);
             if (elementId != null) {

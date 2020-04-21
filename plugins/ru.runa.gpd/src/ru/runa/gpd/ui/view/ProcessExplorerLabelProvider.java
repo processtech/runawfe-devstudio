@@ -38,6 +38,9 @@ public class ProcessExplorerLabelProvider extends LabelProvider {
             if (IOUtils.isProcessDefinitionFolder(folder)) {
                 return SharedImages.getImage("icons/process.gif");
             }
+            else if (IOUtils.isGlobalSectionDefinitionFolder(folder)) {
+                return SharedImages.getImage("icons/glb.gif");
+            }
             return SharedImages.getImage("icons/folder.gif");
         }
         if (element instanceof IFile) {

@@ -82,7 +82,7 @@ public class VariableEditorPage extends EditorPartBase<Variable> {
 
     };
 
-    public VariableEditorPage(ProcessEditorBase editor) {
+    public VariableEditorPage(EditorBase editor) {
         super(editor);
     }
 

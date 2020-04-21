@@ -85,7 +85,7 @@ public class VariableTypeEditorPage extends EditorPartBase<VariableUserType> {
     private Button deleteAttributeButton;
     private Button moveToTypeAttributeButton;
 
-    public VariableTypeEditorPage(ProcessEditorBase editor) {
+    public VariableTypeEditorPage(EditorBase editor) {
         super(editor);
     }
 

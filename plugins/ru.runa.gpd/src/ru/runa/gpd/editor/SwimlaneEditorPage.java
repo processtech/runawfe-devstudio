@@ -68,7 +68,7 @@ public class SwimlaneEditorPage extends EditorPartBase<Swimlane> {
     private Button pasteButton;
     private final boolean swimlanesCreateDeleteEnabled;
 
-    public SwimlaneEditorPage(ProcessEditorBase editor) {
+    public SwimlaneEditorPage(EditorBase editor) {
         super(editor);
         swimlanesCreateDeleteEnabled = editor.getDefinition().getSwimlaneDisplayMode() == SwimlaneDisplayMode.none;
     }

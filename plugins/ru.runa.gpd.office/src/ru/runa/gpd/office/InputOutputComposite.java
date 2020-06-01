@@ -17,8 +17,6 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
-import com.google.common.base.Strings;
-
 import ru.runa.gpd.lang.model.BotTask;
 import ru.runa.gpd.lang.model.Delegable;
 import ru.runa.gpd.lang.model.GraphElement;
@@ -29,6 +27,8 @@ import ru.runa.gpd.util.EmbeddedFileUtils;
 import ru.runa.wfe.InternalApplicationException;
 import ru.runa.wfe.datasource.DataSourceStuff;
 import ru.runa.wfe.var.file.FileVariable;
+
+import com.google.common.base.Strings;
 
 public class InputOutputComposite extends Composite {
     public final InputOutputModel model;
@@ -48,7 +48,7 @@ public class InputOutputComposite extends Composite {
             Group inputGroup = new Group(this, SWT.NONE);
             inputGroup.setText(Messages.getString("label.input"));
             inputGroup.setLayout(new GridLayout(2, false));
-            new ChooseStringOrFile(inputGroup, model.inputPath, model.inputVariable, Messages.getString("label.filePath"), FilesSupplierMode.IN) {
+            new ChooseStringOrFile(inputGroup, model.inputPath, model.inputVariable, FilesSupplierMode.IN) {
                 @Override
                 public void setFileName(String fileName) {
                     model.inputPath = fileName;
@@ -80,7 +80,7 @@ public class InputOutputComposite extends Composite {
                     model.outputFilename = fileNameText.getText();
                 }
             });
-            new ChooseStringOrFile(outputGroup, model.outputDir, model.outputVariable, Messages.getString("label.fileDir"), FilesSupplierMode.OUT) {
+            new ChooseStringOrFile(outputGroup, model.outputDir, model.outputVariable, FilesSupplierMode.OUT) {
                 @Override
                 public void setFileName(String fileName) {
                     model.outputDir = fileName;
@@ -91,6 +91,9 @@ public class InputOutputComposite extends Composite {
                 public void setVariable(String variable) {
                     model.outputDir = "";
                     model.outputVariable = variable;
+                    if (Strings.isNullOrEmpty(fileNameText.getText())) {
+                        fileNameText.setText(".docx");
+                    }
                 }
             };
         }
@@ -104,60 +107,72 @@ public class InputOutputComposite extends Composite {
 
         private Control control = null;
         private final Composite composite;
+        private Runnable[] eventHandlers = new Runnable[5];
 
-        public ChooseStringOrFile(Composite composite, String fileName, String variableName, String stringLabel, FilesSupplierMode mode) {
+        public ChooseStringOrFile(Composite composite, String fileName, String variableName, FilesSupplierMode mode) {
             this.composite = composite;
             final Combo combo = new Combo(composite, SWT.READ_ONLY);
-            combo.add(stringLabel);
-            combo.add(Messages.getString("label.fileVariable"));
+
+            int numHandlers = 0;
+            int fileNameHandler, variableNameHandler;
+            int processFileHandler = -1;
+            int dataSourceNameHandler = -1;
+            int dataSourceVariableNameHandler = -1;
+
             if (mode == FilesSupplierMode.IN) {
                 combo.add(Messages.getString("label.processDefinitionFile"));
+                combo.add(Messages.getString("label.fileVariable"));
+                combo.add(Messages.getString("label.filePath"));
+                eventHandlers[processFileHandler = numHandlers++] = () -> showEmbeddedFile(null);
+                eventHandlers[variableNameHandler = numHandlers++] = () -> showVariable(null);
+                eventHandlers[fileNameHandler = numHandlers++] = () -> showFileName(null);
+            } else {
+                combo.add(Messages.getString("label.fileVariable"));
+                combo.add(Messages.getString("label.fileDir"));
+                eventHandlers[variableNameHandler = numHandlers++] = () -> showVariable(null);
+                eventHandlers[fileNameHandler = numHandlers++] = () -> showFileName(null);
             }
+
             if (model.canWorkWithDataSource) {
                 combo.add(Messages.getString("label.dataSourceName"));
                 combo.add(Messages.getString("label.dataSourceNameVariable"));
+                eventHandlers[dataSourceNameHandler = numHandlers++] = () -> showDataSource(null);
+                eventHandlers[dataSourceVariableNameHandler = numHandlers++] = () -> showDataSourceVariable(null);
             }
+
+            // preference: 1. file variable (if exists), 2. in-process file (if exists or null),
+            // 3. data source (if exists), 4. plain file or directory
             if (!Strings.isNullOrEmpty(variableName)) {
-                combo.select(1);
+                combo.select(variableNameHandler);
                 showVariable(variableName);
-            } else if ((delegable instanceof GraphElement && EmbeddedFileUtils.isProcessFile(fileName))
-                    || (delegable instanceof BotTask && EmbeddedFileUtils.isBotTaskFile(fileName))) {
-                combo.select(2);
+            } else if (processFileHandler >= 0
+                    && (Strings.isNullOrEmpty(fileName) || (delegable instanceof GraphElement && EmbeddedFileUtils.isProcessFile(fileName))
+                            || (delegable instanceof BotTask && EmbeddedFileUtils.isBotTaskFile(fileName)))) {
+                combo.select(processFileHandler);
                 showEmbeddedFile(fileName);
+            } else if (dataSourceNameHandler >= 0 && !Strings.isNullOrEmpty(fileName)
+                    && fileName.startsWith(DataSourceStuff.PATH_PREFIX_DATA_SOURCE)) {
+                combo.select(dataSourceNameHandler);
+                showDataSource(fileName);
+            } else if (dataSourceVariableNameHandler >= 0 && !Strings.isNullOrEmpty(fileName)
+                    && fileName.startsWith(DataSourceStuff.PATH_PREFIX_DATA_SOURCE_VARIABLE)) {
+                combo.select(dataSourceVariableNameHandler);
+                showDataSourceVariable(fileName);
             } else {
-                combo.select(0);
+                combo.select(fileNameHandler);
                 showFileName(fileName);
-                if (!Strings.isNullOrEmpty(fileName)) {
-                    if (fileName.startsWith(DataSourceStuff.PATH_PREFIX_DATA_SOURCE)) {
-                        combo.select(3);
-                        showDataSource(fileName);
-                    } else if (fileName.startsWith(DataSourceStuff.PATH_PREFIX_DATA_SOURCE_VARIABLE)) {
-                        combo.select(4);
-                        showDataSourceVariable(fileName);
-                    }
-                }
             }
             combo.addSelectionListener(new LoggingSelectionAdapter() {
-
                 @Override
                 protected void onSelection(SelectionEvent e) throws Exception {
-                    switch (combo.getSelectionIndex()) {
-                    case 0:
-                        showFileName(null);
-                        break;
-                    case 2:
-                        showEmbeddedFile(null);
-                        break;
-                    case 3:
-                        showDataSource(null);
-                        break;
-                    case 4:
-                        showDataSourceVariable(null);
-                        break;
-                    case 1:
-                    default:
-                        showVariable(null);
+                    int selectionIndex = combo.getSelectionIndex();
+                    if (selectionIndex >= eventHandlers.length) {
+                        return;
                     }
+                    if (eventHandlers[selectionIndex] == null) {
+                        return;
+                    }
+                    eventHandlers[selectionIndex].run();
                 }
             });
         }

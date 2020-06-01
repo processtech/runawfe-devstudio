@@ -39,7 +39,7 @@ import ru.runa.gpd.util.EmbeddedFileUtils;
 import ru.runa.gpd.util.XmlUtil;
 
 import com.google.common.base.Strings;
-
+ 
 public class DocxHandlerCellEditorProvider extends XmlBasedConstructorProvider<DocxModel> implements IBotFileSupportProvider {
 
     @Override

@@ -13,7 +13,8 @@ public class VariableUserType extends EventSupport implements VariableContainer,
     private String name;
     private final List<Variable> attributes = Lists.newArrayList();
     private ProcessDefinition processDefinition;
-
+    private boolean global; 
+    
     public VariableUserType() {
     }
 
@@ -121,7 +122,18 @@ public class VariableUserType extends EventSupport implements VariableContainer,
         VariableUserType type = (VariableUserType) obj;
         return Objects.equal(name, type.name) && Objects.equal(attributes, type.attributes);
     }
+    
+    public boolean isGlobal() {
+        return global;
+    }
 
+    public void setGlobal(boolean global) {
+        if (this.global != global) {
+            this.global = global;
+            firePropertyChange(PROPERTY_GLOBAL, !this.global, this.global);
+        }
+    }
+    
     @Override
     public int compareTo(VariableUserType o) {
         return name.compareTo(o.name);

@@ -52,6 +52,7 @@ import ru.runa.gpd.lang.model.SubprocessDefinition;
 import ru.runa.gpd.lang.par.ParContentProvider;
 
 public class IOUtils {
+	public static final String GLOBAL_ROLE_REF_PREFIX = "Global_";
     private static final ByteArrayInputStream EMPTY_STREAM = new ByteArrayInputStream(new byte[0]);
     private static final List<String> formExtensions = new ArrayList<String>();
     static {

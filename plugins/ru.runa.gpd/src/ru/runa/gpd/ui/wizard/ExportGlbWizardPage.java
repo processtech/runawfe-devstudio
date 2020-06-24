@@ -62,21 +62,20 @@ import ru.runa.gpd.util.IOUtils;
 import ru.runa.gpd.wfe.WFEServerProcessDefinitionImporter;
 
 @SuppressWarnings("restriction")
-public class ExportParWizardPage extends WizardArchiveFileResourceExportPage1 {
+public class ExportGlbWizardPage extends WizardArchiveFileResourceExportPage1 {
     private final Map<String, IFile> definitionNameFileMap;
     private ListViewer definitionListViewer;
     private Button exportToFileButton;
-    private Button exportToServerButton;
     private Button updateLatestVersionButton;
 
-    protected ExportParWizardPage(IStructuredSelection selection) {
+    protected ExportGlbWizardPage(IStructuredSelection selection) {
         super(selection);
-        setTitle(Localization.getString("ExportParWizardPage.page.title"));
-        setDescription(Localization.getString("ExportParWizardPage.page.description"));
+        setTitle(Localization.getString("ExportGlbWizardPage.page.title"));
+        setDescription(Localization.getString("ExportGlbWizardPage.page.description"));
         this.definitionNameFileMap = new TreeMap<String, IFile>();
         for (IFile file : ProcessCache.getAllProcessDefinitionsMap().keySet()) {
             ProcessDefinition definition = ProcessCache.getProcessDefinition(file);
-            if (definition != null && !(definition instanceof SubprocessDefinition) && !(definition instanceof GlobalSectionDefinition)) {
+            if (definition != null && !(definition instanceof SubprocessDefinition) && (definition instanceof GlobalSectionDefinition)) {
                 definitionNameFileMap.put(getKey(file, definition), file);
             }
         }
@@ -92,7 +91,7 @@ public class ExportParWizardPage extends WizardArchiveFileResourceExportPage1 {
         Group processListGroup = new Group(sashForm, SWT.NONE);
         processListGroup.setLayout(new GridLayout(1, false));
         processListGroup.setLayoutData(new GridData(GridData.FILL_BOTH));
-        processListGroup.setText(Localization.getString("label.process"));
+        processListGroup.setText(Localization.getString("label.global_section"));
         createViewer(processListGroup);
         Group exportGroup = new Group(sashForm, SWT.NONE);
         exportGroup.setLayout(new GridLayout(1, false));
@@ -101,8 +100,6 @@ public class ExportParWizardPage extends WizardArchiveFileResourceExportPage1 {
         exportToFileButton.setText(Localization.getString("ExportParWizardPage.page.exportToFileButton"));
         exportToFileButton.setSelection(true);
         createDestinationGroup(exportGroup);
-        exportToServerButton = new Button(exportGroup, SWT.RADIO);
-        exportToServerButton.setText(Localization.getString("ExportParWizardPage.page.exportToServerButton"));
         updateLatestVersionButton = new Button(exportGroup, SWT.CHECK);
         updateLatestVersionButton.setEnabled(false);
         updateLatestVersionButton.setText(Localization.getString("ExportParWizardPage.page.exportToServer.updateMode"));
@@ -245,7 +242,7 @@ public class ExportParWizardPage extends WizardArchiveFileResourceExportPage1 {
                             && !Dialogs.confirm(Localization.getString("ExportParWizardPage.confirm.export.invalid.process", definition.getName()))) {
                         continue;
                     }
-                    String outputFileName = getDestinationValue() + definition.getName() + ".par";
+                    String outputFileName = getDestinationValue() + definition.getName() + ".glb";
                     new ParExportOperation(resourcesToExport, new FileOutputStream(outputFileName)).run(null);
                     if (ProcessSaveHistory.isActive()) {
                         Map<String, File> savepoints = ProcessSaveHistory.getSavepoints(processFolder);

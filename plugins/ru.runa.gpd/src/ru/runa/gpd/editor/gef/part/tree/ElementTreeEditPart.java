@@ -6,6 +6,7 @@ import java.beans.PropertyChangeListener;
 import org.eclipse.gef.editparts.AbstractTreeEditPart;
 
 import ru.runa.gpd.PropertyNames;
+import ru.runa.gpd.lang.model.GlobalSectionDefinition;
 import ru.runa.gpd.lang.model.GraphElement;
 
 public class ElementTreeEditPart extends AbstractTreeEditPart implements PropertyChangeListener, PropertyNames {
@@ -41,7 +42,9 @@ public class ElementTreeEditPart extends AbstractTreeEditPart implements Propert
 
     @Override
     protected void refreshVisuals() {
-        setWidgetText(getModel().getLabel());
+    	if (getModel() instanceof GlobalSectionDefinition && getModel().getLabel().length() >= 1) {
+    		setWidgetText(getModel().getLabel().substring(1));
+    	}
         setWidgetImage(getModel().getEntryImage());
     }
 

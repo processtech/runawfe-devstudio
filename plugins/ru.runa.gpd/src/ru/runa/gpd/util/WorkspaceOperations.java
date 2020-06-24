@@ -50,9 +50,11 @@ import ru.runa.gpd.ProcessCache;
 import ru.runa.gpd.SubprocessMap;
 import ru.runa.gpd.editor.BotTaskEditor;
 import ru.runa.gpd.editor.ProcessEditorBase;
+import ru.runa.gpd.editor.GlobalSectionEditorBase;
 import ru.runa.gpd.editor.ProcessSaveHistory;
 import ru.runa.gpd.editor.gef.GEFProcessEditor;
 import ru.runa.gpd.editor.graphiti.GraphitiProcessEditor;
+import ru.runa.gpd.editor.graphiti.GraphitiGlobalSectionEditor;
 import ru.runa.gpd.extension.DelegableProvider;
 import ru.runa.gpd.extension.HandlerRegistry;
 import ru.runa.gpd.extension.bot.IBotFileSupportProvider;
@@ -79,15 +81,18 @@ import ru.runa.gpd.ui.wizard.ExportBotElementWizardPage;
 import ru.runa.gpd.ui.wizard.ExportBotWizard;
 import ru.runa.gpd.ui.wizard.ExportDataSourceWizard;
 import ru.runa.gpd.ui.wizard.ExportParWizard;
+import ru.runa.gpd.ui.wizard.ExportGlbWizard;
 import ru.runa.gpd.ui.wizard.ImportBotElementWizardPage;
 import ru.runa.gpd.ui.wizard.ImportBotWizard;
 import ru.runa.gpd.ui.wizard.ImportDataSourceWizard;
 import ru.runa.gpd.ui.wizard.ImportParWizard;
+import ru.runa.gpd.ui.wizard.ImportGlbWizard;
 import ru.runa.gpd.ui.wizard.NewBotStationWizard;
 import ru.runa.gpd.ui.wizard.NewBotTaskWizard;
 import ru.runa.gpd.ui.wizard.NewBotWizard;
 import ru.runa.gpd.ui.wizard.NewFolderWizard;
 import ru.runa.gpd.ui.wizard.NewProcessDefinitionWizard;
+import ru.runa.gpd.ui.wizard.NewGlobalSectionDefinitionWizard;
 import ru.runa.gpd.ui.wizard.NewProcessProjectWizard;
 import ru.runa.wfe.InternalApplicationException;
 import ru.runa.wfe.datasource.DataSourceStuff;
@@ -221,6 +226,16 @@ public class WorkspaceOperations {
         return null;
     }
 
+    public static ProcessDefinition createNewGlobalSectionDefinition(IStructuredSelection selection, ProcessDefinitionAccessType accessType) {
+        NewGlobalSectionDefinitionWizard wizard = new NewGlobalSectionDefinitionWizard(accessType);
+        wizard.init(PlatformUI.getWorkbench(), selection);
+        WizardDialog dialog = new WizardDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), wizard);
+        if (dialog.open() == Window.OK) {
+            return ProcessCache.getProcessDefinition(wizard.getDefinitionFile());
+        }
+        return null;
+    }
+    
     public static void copyProcessDefinition(IStructuredSelection selection) {
         IFolder processDefinitionFolder = (IFolder) selection.getFirstElement();
         IDE.saveAllEditors(new IResource[] { processDefinitionFolder }, true);
@@ -279,6 +294,58 @@ public class WorkspaceOperations {
         }
     }
 
+    public static void renameGlobalDefinition(IStructuredSelection selection) {
+        IFolder oldDefinitionFolder = (IFolder) selection.getFirstElement();
+        IFile oldDefinitionFile = IOUtils.getProcessDefinitionFile(oldDefinitionFolder);
+        RenameProcessDefinitionDialog dialog = new RenameProcessDefinitionDialog(oldDefinitionFolder);
+        ProcessDefinition definition = ProcessCache.getProcessDefinition(oldDefinitionFile);
+        String oldName = definition.getName();
+        if (oldName.length() > 1) {
+        	oldName = oldName.substring(1);
+        }
+        dialog.setName(oldName);
+        if (dialog.open() != IDialogConstants.OK_ID) {
+            return;
+        }
+        String newName = "." + dialog.getName();
+        try {
+            // Close ALL editors related to the process BEFORE renaiming it.
+            IProject project = oldDefinitionFolder.getProject();
+            IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+            IEditorReference[] editorRefs = page.getEditorReferences();
+            ArrayList<IEditorReference> editorRefsToClose = new ArrayList<IEditorReference>(editorRefs.length);
+            for (IEditorReference e : editorRefs) {
+                // Work only on IEditorReference-s since IEditorPart-s may be uninitialized and we don't want to "restore" them just to close.
+                if (e.getEditorInput() instanceof IFileEditorInput) {
+                    // We get here at least if e is GraphitiProcessEditor or FormEditor.
+                    IFile f = ((IFileEditorInput) e.getEditorInput()).getFile();
+                    if (f.getProject() == project && Objects.equal(f.getFullPath().segment(1), oldName)) {
+                        editorRefsToClose.add(e);
+                    }
+                }
+            }
+            if (!editorRefsToClose.isEmpty()) {
+                // Close all at once! Otherwise, for example, when ProcessEditor is closed FormEditor may take focus and initialize.
+                // 2nd parameter save=false prevents "Save changed files?" dialog: they are saved anyway.
+                page.closeEditors(editorRefsToClose.toArray(new IEditorReference[editorRefsToClose.size()]), false);
+            }
+            ProcessCache.processDefinitionWasDeleted(oldDefinitionFile);
+            IPath newPath = oldDefinitionFolder.getParent().getFolder(new Path(newName)).getFullPath();
+            IFolder newDefinitionFolder = ResourcesPlugin.getWorkspace().getRoot().getFolder(newPath);
+            oldDefinitionFolder.copy(newDefinitionFolder.getFullPath(), true, new NullProgressMonitor());
+            IFile newDefinitionFile = IOUtils.getProcessDefinitionFile(newDefinitionFolder);
+            definition = ProcessCache.getProcessDefinition(newDefinitionFile);
+            definition.setName(newName);
+            saveProcessDefinition(definition);
+            ProcessCache.newProcessDefinitionWasCreated(newDefinitionFile);
+            ProcessSaveHistory.clear(oldDefinitionFolder);
+            oldDefinitionFolder.delete(true, new NullProgressMonitor());
+            refreshResource(newDefinitionFolder);
+        } catch (Exception e) {
+            PluginLogger.logError(e);
+        }
+    }
+    
     public static void renameSubProcessDefinition(IStructuredSelection selection) {
         IFile subdefinitionFile = (IFile) selection.getFirstElement();
         IFolder definitionFolder = (IFolder) subdefinitionFile.getParent();
@@ -363,6 +430,26 @@ public class WorkspaceOperations {
         }
         return null;
     }
+    
+    public static ProcessEditorBase openGlobalSectionDefinition(IFile definitionFile) {
+        try {
+            ProcessDefinition processDefinition = ProcessCache.getProcessDefinition(definitionFile);
+            String editorId;
+            if (processDefinition.getLanguage() == Language.BPMN) {
+                editorId = GraphitiGlobalSectionEditor.ID;
+            } else {
+                editorId = GEFProcessEditor.ID;
+            }
+            IEditorPart editorPart = IDE.openEditor(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage(), definitionFile, editorId,
+                    true);
+            if (editorPart instanceof ProcessEditorBase) {
+                return (ProcessEditorBase) editorPart;
+            }
+        } catch (PartInitException e) {
+            PluginLogger.logError("Unable open diagram", e);
+        }
+        return null;
+    }
 
     /**
      * @return process editor or <code>null</code>
@@ -408,6 +495,20 @@ public class WorkspaceOperations {
         dialog.open();
     }
 
+    public static void exportGlobalSectionDefinition(IStructuredSelection selection) {
+        ExportGlbWizard wizard = new ExportGlbWizard();
+        wizard.init(PlatformUI.getWorkbench(), selection);
+        CompactWizardDialog dialog = new CompactWizardDialog(wizard);
+        dialog.open();
+    }
+
+    public static void importGlobalSectionDefinition(IStructuredSelection selection) {
+        ImportGlbWizard wizard = new ImportGlbWizard();
+        wizard.init(PlatformUI.getWorkbench(), selection);
+        CompactWizardDialog dialog = new CompactWizardDialog(wizard);
+        dialog.open();
+    }
+    
     public static void showProcessSaveHistory(IStructuredSelection selection) {
         new ProcessSaveHistoryDialog((IFolder) selection.getFirstElement()).open();
     }

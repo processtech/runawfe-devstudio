@@ -9,6 +9,7 @@ import org.eclipse.ui.PlatformUI;
 import ru.runa.gpd.editor.CopyAction;
 import ru.runa.gpd.editor.PasteAction;
 import ru.runa.gpd.editor.ProcessEditorBase;
+import ru.runa.gpd.editor.GlobalSectionEditorBase;
 import ru.runa.gpd.editor.graphiti.DiagramEditorPage;
 import ru.runa.gpd.lang.model.GraphElement;
 import ru.runa.gpd.lang.model.ProcessDefinition;
@@ -56,7 +57,7 @@ public aspect ProcessEditorUserActivity extends UserActivity {
                 Object lastSelected = structuredSelection.toArray()[structuredSelection.size() - 1];
                 if (lastSelected instanceof EditPart) {
                     EditPart editPart = (EditPart) lastSelected;
-                    if (editPart.getModel() instanceof PictogramElement) {
+                    if (editPart.getModel() instanceof PictogramElement && !(editor instanceof GlobalSectionEditorBase)) {
                         GraphElement ge = (GraphElement) ((DiagramEditorPage) editor.getDiagramEditorPage()).getDiagramTypeProvider()
                                 .getFeatureProvider().getBusinessObjectForPictogramElement((PictogramElement) editPart.getModel());
                         if (ge != null) {

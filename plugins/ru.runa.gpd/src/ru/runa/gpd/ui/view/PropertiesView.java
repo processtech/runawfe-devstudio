@@ -38,6 +38,7 @@ import org.eclipse.ui.part.ViewPart;
 import org.eclipse.ui.views.properties.IPropertyDescriptor;
 import org.eclipse.ui.views.properties.IPropertySource;
 import ru.runa.gpd.editor.graphiti.GraphitiProcessEditor;
+import ru.runa.gpd.editor.graphiti.GraphitiGlobalSectionEditor;
 import ru.runa.gpd.lang.model.GraphElement;
 import ru.runa.gpd.util.UiUtil;
 
@@ -150,6 +151,9 @@ public class PropertiesView extends ViewPart implements ISelectionListener, Prop
         IPropertySource newSource = getSource(selection);
         if (part instanceof GraphitiProcessEditor) {
             newSource = ((GraphitiProcessEditor) part).translateSelection(selection);
+        }
+        else if (part instanceof GraphitiGlobalSectionEditor) {
+            newSource = ((GraphitiGlobalSectionEditor) part).translateSelection(selection);
         }
         if (Objects.equal(source, newSource)) {
             return;

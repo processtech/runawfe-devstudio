@@ -31,7 +31,8 @@ public class VariablesXmlContentProvider extends AuxContentProvider {
     private static final String STORE_TYPE = "storeType";
     private static final String USER_TYPE = "usertype";
     private static final String EDITOR = "editor";
-
+    private static final String GLOBAL = "global";
+    
     @Override
     public boolean isSupportedForEmbeddedSubprocess() {
         return false;
@@ -48,6 +49,7 @@ public class VariablesXmlContentProvider extends AuxContentProvider {
         for (Element typeElement : typeElements) {
             VariableUserType type = new VariableUserType();
             type.setName(typeElement.attributeValue(NAME));
+            type.setGlobal("true".equals(typeElement.attributeValue(GLOBAL)));
             definition.addVariableUserType(type);
         }
         for (Element typeElement : typeElements) {
@@ -63,6 +65,7 @@ public class VariablesXmlContentProvider extends AuxContentProvider {
             if ("true".equals(element.attributeValue(SWIMLANE, "false"))) {
                 String variableName = element.attributeValue(NAME);
                 String scriptingName = element.attributeValue(SCRIPTING_NAME, variableName);
+                String isGLobal = element.attributeValue(GLOBAL);
                 // old version processes may contain invalid names
                 if (!VariableUtils.isValidScriptingName(scriptingName)) {
                     scriptingName = VariableUtils.toScriptingName(scriptingName);
@@ -82,6 +85,7 @@ public class VariablesXmlContentProvider extends AuxContentProvider {
                     swimlane.setEditorPath(element.attributeValue(EDITOR));
                     swimlane.setStoreType(element.attributeValue(STORE_TYPE, null) != null ? VariableStoreType.valueOf(element.attributeValue(
                             STORE_TYPE).toUpperCase()) : VariableStoreType.DEFAULT);
+                    swimlane.setGlobal("true".equals(isGLobal));
                 } catch (Exception e) {
                     PluginLogger.logErrorWithoutDialog("No swimlane found for " + variableName, e);
                 }
@@ -108,6 +112,7 @@ public class VariablesXmlContentProvider extends AuxContentProvider {
         String defaultValue = element.attributeValue(DEFAULT_VALUE);
         String scriptingName = element.attributeValue(SCRIPTING_NAME, variableName);
         String description = element.attributeValue(DESCRIPTION);
+        String isGLobal = element.attributeValue(GLOBAL);;
         VariableStoreType storeType = element.attributeValue(STORE_TYPE, null) != null ? VariableStoreType.valueOf(element.attributeValue(STORE_TYPE)
                 .toUpperCase()) : VariableStoreType.DEFAULT;
         if ("false".equals(description)) {
@@ -119,6 +124,7 @@ public class VariablesXmlContentProvider extends AuxContentProvider {
         variable.setDefaultValue(defaultValue);
         variable.setDescription(description);
         variable.setStoreType(storeType);
+        variable.setGlobal("true".equals(isGLobal));
         return variable;
     }
 
@@ -129,6 +135,7 @@ public class VariablesXmlContentProvider extends AuxContentProvider {
         for (VariableUserType type : definition.getVariableUserTypes()) {
             Element typeElement = root.addElement(USER_TYPE);
             typeElement.addAttribute(NAME, type.getName());
+            typeElement.addAttribute(GLOBAL, String.valueOf(type.isGlobal()));
             for (Variable variable : type.getAttributes()) {
                 writeVariable(typeElement, variable);
             }
@@ -145,6 +152,7 @@ public class VariablesXmlContentProvider extends AuxContentProvider {
         Element element = root.addElement(VARIABLE);
         element.addAttribute(NAME, variable.getName());
         element.addAttribute(SCRIPTING_NAME, variable.getScriptingName());
+        element.addAttribute(GLOBAL, String.valueOf(variable.isGlobal()));
         if (variable.getStoreType() != VariableStoreType.DEFAULT) {
             element.addAttribute(STORE_TYPE, variable.getStoreType().asProperty());
         }

@@ -50,5 +50,22 @@ public abstract class FileNameChecker extends KeyAdapter {
             return Arrays.binarySearch(forbiddenFullNames, fileName.toLowerCase()) < 0;
         }
     }
-
+    
+    public static boolean firstSymbolIsDot(String fileName) {
+    	if (fileName == null) {
+    		return false;
+    	} else {
+    		final int length = fileName.length();
+    		if (length == 0) {
+    			return false;
+    		} else {
+    			final char firstChar = fileName.charAt(0);
+    			if (firstChar == '.') {
+    				return true;
+    			}
+    		}
+    	}
+    	return false;
+    }
+    
 }

@@ -15,7 +15,6 @@ import ru.runa.wfe.var.format.ExecutorFormat;
 
 public class Swimlane extends Variable implements Delegable {
 
-    public static final String GLOBAL_ROLE_REF_PREFIX = "Global_";
     public static final String DEFAULT_DELEGATION_CLASS_NAME = DefaultAssignmentHandler.class.getName();
     private String editorPath;
 

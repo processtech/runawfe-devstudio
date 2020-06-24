@@ -3,6 +3,8 @@ package ru.runa.gpd.ui.wizard;
 import java.util.List;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.WizardPage;
@@ -28,7 +30,7 @@ import ru.runa.gpd.ui.custom.FileNameChecker;
 import ru.runa.gpd.util.IOUtils;
 import ru.runa.gpd.util.SwimlaneDisplayMode;
 
-public class NewProcessDefinitionWizardPage extends WizardPage {
+public class NewGlobalSectionDefinitionWizardPage extends WizardPage {
     private Combo projectCombo;
     private Text processText;
     private Combo languageCombo;
@@ -38,10 +40,10 @@ public class NewProcessDefinitionWizardPage extends WizardPage {
     private final List<IContainer> processContainers;
     private final ProcessDefinition parentProcessDefinition;
 
-    public NewProcessDefinitionWizardPage(IStructuredSelection selection, ProcessDefinition parentProcessDefinition) {
+    public NewGlobalSectionDefinitionWizardPage(IStructuredSelection selection, ProcessDefinition parentProcessDefinition) {
         super(Localization.getString("NewProcessDefinitionWizardPage.page.name"));
-        setTitle(Localization.getString("NewProcessDefinitionWizardPage.page.title"));
-        setDescription(Localization.getString("NewProcessDefinitionWizardPage.page.description"));
+        setTitle(Localization.getString("NewGlobalSectionDefinitionWizardPage.page.title"));
+        setDescription(Localization.getString("NewGlobalSectionWizardPage.page.description"));
         this.initialSelection = (IContainer) IOUtils.getProcessSelectionResource(selection);
         this.processContainers = IOUtils.getAllProcessContainers();
         this.parentProcessDefinition = parentProcessDefinition;
@@ -72,7 +74,22 @@ public class NewProcessDefinitionWizardPage extends WizardPage {
         label.setText(Localization.getString("label.project"));
         projectCombo = new Combo(parent, SWT.SINGLE | SWT.READ_ONLY | SWT.BORDER);
         for (IContainer container : processContainers) {
-            projectCombo.add(IOUtils.getProcessContainerName(container));
+        	try {
+        		boolean folderContainGlobalSection = false;
+				for (IResource resource : container.members()) {
+					if (resource instanceof IFolder && 
+					IOUtils.isProcessDefinitionFolder((IFolder)resource) &&
+					resource.getName().startsWith(".")) {
+						folderContainGlobalSection = true;
+						break;
+					}
+				}
+				if (!folderContainGlobalSection) {
+					projectCombo.add(IOUtils.getProcessContainerName(container));
+				}
+			} catch (CoreException e1) {
+				e1.printStackTrace();
+			}
         }
         projectCombo.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         if (initialSelection != null) {
@@ -92,7 +109,7 @@ public class NewProcessDefinitionWizardPage extends WizardPage {
 
     private void createProcessNameField(Composite parent) {
         Label label = new Label(parent, SWT.NONE);
-        label.setText(Localization.getString("label.process_name"));
+        label.setText(Localization.getString("label.section_name"));
         processText = new Text(parent, SWT.BORDER);
         processText.addModifyListener(new ModifyListener() {
             @Override
@@ -127,6 +144,8 @@ public class NewProcessDefinitionWizardPage extends WizardPage {
             languageCombo.setText(parentProcessDefinition.getLanguage().name());
             languageCombo.setEnabled(false);
         }
+        label.setVisible(false);
+        languageCombo.setVisible(false);
     }
 
     private void createBpmnDisplaySwimlaneCombo(Composite parent) {
@@ -142,6 +161,8 @@ public class NewProcessDefinitionWizardPage extends WizardPage {
             bpmnDisplaySwimlaneCombo.setText(SwimlaneDisplayMode.none.getLabel());
             bpmnDisplaySwimlaneCombo.setEnabled(false);
         }
+        label.setVisible(false);
+        bpmnDisplaySwimlaneCombo.setVisible(false);
     }
 
     private void createCssTemplateCombo(Composite parent) {
@@ -159,6 +180,8 @@ public class NewProcessDefinitionWizardPage extends WizardPage {
             }
         }
         cssTemplateCombo.select(0);
+        label.setVisible(false);
+        cssTemplateCombo.setVisible(false);
     }
 
     private void verifyContentsValid() {
@@ -187,12 +210,12 @@ public class NewProcessDefinitionWizardPage extends WizardPage {
         if (parentProcessDefinition != null) {
             return parentProcessDefinition.getEmbeddedSubprocessByName(getProcessName()) != null;
         } else {
-            return getProcessFolder().exists();
+            return getProcessFolderByCreate().exists();
         }
     }
 
     public String getProcessName() {
-        return processText.getText();
+        return "." + processText.getText();
     }
 
     public Language getLanguage() {
@@ -210,6 +233,16 @@ public class NewProcessDefinitionWizardPage extends WizardPage {
         return cssTemplateCombo.getText();
     }
 
+    public IFolder getProcessFolderByCreate() {
+    	String projectName = projectCombo.getItem(projectCombo.getSelectionIndex());
+    	IContainer container = processContainers.stream().filter(p -> String.join("/", p.getFullPath().segments()).equals(projectName)).findFirst().get();
+    	if (parentProcessDefinition != null) {
+            return (IFolder) container;
+        } else {
+            return IOUtils.getProcessFolder(container, getProcessName());
+        }
+    }
+    
     public IFolder getProcessFolder() {
         IContainer container = processContainers.get(projectCombo.getSelectionIndex());
         if (parentProcessDefinition != null) {

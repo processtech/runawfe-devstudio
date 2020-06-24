@@ -23,6 +23,13 @@
           name="GraphitiEditor">
     </editor>
     <editor
+          class="ru.runa.gpd.editor.graphiti.GraphitiGlobalSectionEditor"
+          contributorClass="ru.runa.gpd.editor.graphiti.DiagramActionBarContributor"
+          icon="icons/bpmn/community_icon.png"
+          id="ru.runa.gpd.GraphitiGlobalSectionEditor"
+          name="GraphitiGlobalSectionEditor">
+    </editor>
+    <editor
           class="ru.runa.gpd.editor.gef.GEFProcessEditor"
           contributorClass="ru.runa.gpd.editor.gef.GEFActionBarContributor"
           icon="icons/process.gif"
@@ -1137,6 +1144,19 @@
             jpdl="process-definition"
             label="%label.processDefinition"
             model="ru.runa.gpd.lang.model.ProcessDefinition"
+            type="definition">
+         <gef 
+            figure="ru.runa.gpd.editor.gef.figure.GridSupportLayer"
+            graphicalEditPart="ru.runa.gpd.editor.gef.part.graph.ProcessDefinitionGraphicalEditPart"
+            treeEditPart="ru.runa.gpd.editor.gef.part.tree.ProcessDefinitionTreeEditPart">
+         </gef>
+      </element>
+      <element
+            bpmn="process"
+            hasPreferencePage="false"
+            jpdl="process-definition"
+            label="%label.globalSectionDefinition"
+            model="ru.runa.gpd.lang.model.GlobalSectionDefinition"
             type="definition">
          <gef 
             figure="ru.runa.gpd.editor.gef.figure.GridSupportLayer"
@@ -2515,6 +2535,16 @@
                style="push"
                toolbarPath="normal/processes"
                tooltip="%tooltip.menu.newProcess"/>
+        <action
+               class="ru.runa.gpd.ui.action.NewGlobalSectionAction"
+               definitionId="ru.runa.gpd.commands.new.global.section"
+               icon="icons/glb.gif"
+               id="ru.runa.gpd.newGlobalSection"
+               label="%label.menu.newGlobalSection"
+               menubarPath="file/newFile/common"
+               style="push"
+               toolbarPath="normal/processes"
+               tooltip="%tooltip.menu.newGlobalSection"/>
          <action
                class="ru.runa.gpd.ui.action.NewProjectAction"
                icon="icons/new_project16x16.gif"
@@ -2602,6 +2632,23 @@
                toolbarPath="normal/syncbots"
                tooltip="%tooltip.menu.importBotElement"/>
          <action
+               class="ru.runa.gpd.ui.action.ExportGlobalSectionAction"
+               icon="icons/export_glb.gif"
+               id="ru.runa.gpd.exportGlobalSection"
+               label="%label.menu.export.global.section"
+               menubarPath="file/export"
+               style="push"
+               toolbarPath="normal/syncproc"
+               tooltip="%tooltip.menu.export.global.section"/>
+         <action
+               class="ru.runa.gpd.ui.action.ImportGlobalSectionAction"
+               icon="icons/import_glb.gif"
+               id="ru.runa.gpd.importGlobalSection"
+               label="%label.menu.import.global.section"
+               menubarPath="file/export"
+               style="push"
+               toolbarPath="normal/syncproc"/>               
+         <action
                class="ru.runa.gpd.ui.action.ExportProcessAction"
                icon="icons/export_wiz.gif"
                id="ru.runa.gpd.exportProcess"
@@ -2618,7 +2665,6 @@
                menubarPath="file/export"
                style="push"
                toolbarPath="normal/syncproc"/>
-          
          <action
                class="ru.runa.gpd.ui.action.ExportProject"
                icon="icons/export_bot.gif"
@@ -2866,6 +2912,12 @@
             sequence="Ctrl+N">
       </key>
       <key
+            commandId="ru.runa.gpd.commands.new.global.section"
+            contextId="ru.runa.gpd.context.app"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="Ctrl+G">
+      </key>
+      <key
             commandId="ru.runa.gpd.commands.save"
             contextId="ru.runa.gpd.context.app"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
@@ -2894,6 +2946,10 @@
       <command
             id="ru.runa.gpd.commands.new"
             name="ru.runa.gpd.commands.new">
+      </command>
+      <command
+            id="ru.runa.gpd.commands.new.global.section"
+            name="ru.runa.gpd.commands.new.global.section">
       </command>
       <command
             id="ru.runa.gpd.commands.save"

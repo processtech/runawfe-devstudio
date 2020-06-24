@@ -36,6 +36,7 @@ import ru.runa.gpd.extension.HandlerRegistry;
 import ru.runa.gpd.lang.NodeRegistry;
 import ru.runa.gpd.lang.model.FormNode;
 import ru.runa.gpd.lang.model.ProcessDefinition;
+import ru.runa.gpd.lang.model.GlobalSectionDefinition;
 import ru.runa.gpd.lang.model.SubprocessDefinition;
 import ru.runa.gpd.lang.model.Swimlane;
 import ru.runa.gpd.lang.model.SwimlanedNode;
@@ -139,6 +140,24 @@ public class SwimlaneEditorPage extends EditorPartBase<Swimlane> {
 
     @Override
     protected void updateUI() {
+    	updateViewer();
+    }
+
+    private boolean withoutGlobals(List<Swimlane> list) {
+        for (Swimlane swimlane : list) {
+            if (swimlane.isGlobal()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private void updateViewer() {
+        List<Swimlane> swimlane_list = getDefinition().getSwimlanes();
+        tableViewer.setInput(swimlane_list);
+        for (Swimlane swimlane : swimlane_list) {
+            swimlane.addPropertyChangeListener(this);
+        }
         List<Swimlane> swimlanes = (List<Swimlane>) tableViewer.getInput();
         List<Swimlane> selected = ((IStructuredSelection) tableViewer.getSelection()).toList();
         boolean withoutGlobals = withoutGlobals(selected);
@@ -157,24 +176,6 @@ public class SwimlaneEditorPage extends EditorPartBase<Swimlane> {
             }
         }
         enableAction(pasteButton, swimlanesCreateDeleteEnabled && pasteEnabled);
-    }
-
-    private boolean withoutGlobals(List<Swimlane> list) {
-        for (Swimlane swimlane : list) {
-            if (swimlane.isGlobal()) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    private void updateViewer() {
-        List<Swimlane> swimlanes = getDefinition().getSwimlanes();
-        tableViewer.setInput(swimlanes);
-        for (Swimlane swimlane : swimlanes) {
-            swimlane.addPropertyChangeListener(this);
-        }
-        updateUI();
     }
 
     private void delete(Swimlane swimlane) throws Exception {
@@ -313,9 +314,9 @@ public class SwimlaneEditorPage extends EditorPartBase<Swimlane> {
                 if (processDefinitionFile.exists()) {
                     if (!resource.getName().startsWith(".")) {
                         String content = IOUtils.readStream(processDefinitionFile.getContents());
-                        String oldReference = "=\"" + Swimlane.GLOBAL_ROLE_REF_PREFIX + oldName + "\"";
+                        String oldReference = IOUtils.GLOBAL_ROLE_REF_PREFIX + oldName;
                         if (content.contains(oldReference)) {
-                            content = content.replaceAll(oldReference, "=\"" + (newName == null ? "" : Swimlane.GLOBAL_ROLE_REF_PREFIX + newName) + "\"");
+                            content = content.replaceAll(oldReference, newName == null ? "" : IOUtils.GLOBAL_ROLE_REF_PREFIX + newName);
                             processDefinitionFile.setContents(new ByteArrayInputStream(content.getBytes(Charsets.UTF_8)), true, true, null);
                             ProcessCache.invalidateProcessDefinition(processDefinitionFile);
                         }
@@ -334,6 +335,9 @@ public class SwimlaneEditorPage extends EditorPartBase<Swimlane> {
             @SuppressWarnings("unchecked")
             List<Swimlane> swimlanes = selection.toList();
             for (Swimlane swimlane : swimlanes) {
+            	if (getDefinition() instanceof GlobalSectionDefinition) {
+            		((GlobalSectionDefinition)getDefinition()).removeGlobalSwimlaneInAllProcess(swimlane, getDefinition().getFile().getParent().getParent());
+            	}
                 delete(swimlane);
             }
         }

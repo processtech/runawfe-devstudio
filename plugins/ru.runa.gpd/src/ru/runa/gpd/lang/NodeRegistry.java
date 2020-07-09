@@ -13,6 +13,11 @@ import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.Platform;
 
+import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+
 import ru.runa.gpd.PluginLogger;
 import ru.runa.gpd.ProcessCache;
 import ru.runa.gpd.lang.model.GraphElement;
@@ -22,11 +27,7 @@ import ru.runa.gpd.lang.par.ParContentProvider;
 import ru.runa.gpd.util.IOUtils;
 import ru.runa.gpd.util.XmlUtil;
 
-import com.google.common.base.Objects;
-import com.google.common.base.Preconditions;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-
+@SuppressWarnings("restriction")
 public class NodeRegistry {
     private static Map<String, NodeTypeDefinition> typesByModelClass = Maps.newHashMap();
     private static List<NodeTypeDefinition> definitions = Lists.newArrayList();
@@ -40,7 +41,7 @@ public class NodeRegistry {
             IConfigurationElement[] configElements = extension.getConfigurationElements();
             for (IConfigurationElement configElement : configElements) {
                 try {
-                    processConfigElement(configElement);
+                    processConfigElement(configElement);                    
                 } catch (Exception e) {
                     PluginLogger.logError("Error processing ru.runa.gpd.elements extension", e);
                 }

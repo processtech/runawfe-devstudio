@@ -73,15 +73,11 @@ public abstract class ProcessEditorBase extends MultiPageEditorPart implements I
     @Override
     public void init(IEditorSite site, IEditorInput input) throws PartInitException {
         super.init(site, input);
-
         getSite().getPage().addSelectionListener(this);
         ResourcesPlugin.getWorkspace().addResourceChangeListener(this, IResourceChangeEvent.POST_CHANGE);
-
         definitionFile = ((FileEditorInput) input).getFile();
-        definition = ProcessCache.getProcessDefinition(definitionFile);
-        definition.setDirty(false);
+        definition = ProcessCache.getProcessDefinition(definitionFile);         
         definition.addPropertyChangeListener(this);
-
         setPartName(definition.getName());
     }
 

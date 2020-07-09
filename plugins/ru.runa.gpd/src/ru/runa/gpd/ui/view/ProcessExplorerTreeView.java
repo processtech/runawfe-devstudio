@@ -154,7 +154,7 @@ public class ProcessExplorerTreeView extends ViewPart implements ISelectionListe
         if (element instanceof IFile) {
             WorkspaceOperations.openProcessDefinition((IFile) element);
         }
-    }
+    }    
 
     @SuppressWarnings({ "unchecked" })
     protected void fillContextMenu(IMenuManager manager) {

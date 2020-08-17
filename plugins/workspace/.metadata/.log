@@ -1,0 +1,66 @@
+!SESSION 2020-03-17 23:32:04.731 -----------------------------------------------
+eclipse.buildId=unknown
+java.version=11.0.4
+java.vendor=Oracle Corporation
+BootLoader constants: OS=linux, ARCH=x86_64, WS=gtk, NL=ru_RU
+Framework arguments:  -eclipse.keyring /tmp/tycho6869856694066613884secure_storage
+Command-line arguments:  -eclipse.keyring /tmp/tycho6869856694066613884secure_storage
+
+!ENTRY org.eclipse.equinox.p2.transport.ecf 2 0 2020-03-17 23:32:04.732
+!MESSAGE Connection to http://mirror.tspu.ru/eclipse/releases/2018-09/201809191002/features/org.eclipse.emf.common_2.15.0.v20180723-1316.jar failed on mirror.tspu.ru: С именем узла не связано ни одного адреса. Retry attempt 0 started
+!STACK 0
+java.net.UnknownHostException: mirror.tspu.ru: С именем узла не связано ни одного адреса
+	at java.base/java.net.Inet6AddressImpl.lookupAllHostAddr(Native Method)
+	at java.base/java.net.InetAddress$PlatformNameService.lookupAllHostAddr(InetAddress.java:929)
+	at java.base/java.net.InetAddress.getAddressesFromNameService(InetAddress.java:1515)
+	at java.base/java.net.InetAddress$NameServiceAddresses.get(InetAddress.java:848)
+	at java.base/java.net.InetAddress.getAllByName0(InetAddress.java:1505)
+	at java.base/java.net.InetAddress.getAllByName(InetAddress.java:1364)
+	at java.base/java.net.InetAddress.getAllByName(InetAddress.java:1298)
+	at org.apache.http.impl.conn.SystemDefaultDnsResolver.resolve(SystemDefaultDnsResolver.java:45)
+	at org.apache.http.impl.conn.DefaultHttpClientConnectionOperator.connect(DefaultHttpClientConnectionOperator.java:112)
+	at org.apache.http.impl.conn.PoolingHttpClientConnectionManager.connect(PoolingHttpClientConnectionManager.java:373)
+	at org.apache.http.impl.execchain.MainClientExec.establishRoute(MainClientExec.java:394)
+	at org.apache.http.impl.execchain.MainClientExec.execute(MainClientExec.java:237)
+	at org.apache.http.impl.execchain.ProtocolExec.execute(ProtocolExec.java:185)
+	at org.apache.http.impl.execchain.RetryExec.execute(RetryExec.java:89)
+	at org.apache.http.impl.execchain.RedirectExec.execute(RedirectExec.java:110)
+	at org.apache.http.impl.client.InternalHttpClient.doExecute(InternalHttpClient.java:185)
+	at org.apache.http.impl.client.CloseableHttpClient.execute(CloseableHttpClient.java:83)
+	at org.eclipse.ecf.provider.filetransfer.httpclient45.HttpClientRetrieveFileTransfer.performConnect(HttpClientRetrieveFileTransfer.java:1000)
+	at org.eclipse.ecf.provider.filetransfer.httpclient45.HttpClientRetrieveFileTransfer.access$0(HttpClientRetrieveFileTransfer.java:992)
+	at org.eclipse.ecf.provider.filetransfer.httpclient45.HttpClientRetrieveFileTransfer$1.performFileTransfer(HttpClientRetrieveFileTransfer.java:988)
+	at org.eclipse.ecf.filetransfer.FileTransferJob.run(FileTransferJob.java:74)
+	at org.eclipse.core.internal.jobs.Worker.run(Worker.java:63)
+!SESSION 2020-03-17 23:44:07.232 -----------------------------------------------
+eclipse.buildId=unknown
+java.version=1.8.0_231
+java.vendor=Oracle Corporation
+BootLoader constants: OS=linux, ARCH=x86_64, WS=gtk, NL=ru_RU
+Framework arguments:  -eclipse.keyring /tmp/tycho8207557885385512172secure_storage
+Command-line arguments:  -eclipse.keyring /tmp/tycho8207557885385512172secure_storage
+
+!ENTRY org.eclipse.equinox.p2.director 0 0 2020-03-17 23:44:07.232
+!MESSAGE Overall install request is satisfiable
+!SUBENTRY 1 org.eclipse.equinox.p2.director 0 0 2020-03-17 23:44:07.233
+!MESSAGE Add request for RunaWFE Developer Studio 4.4.0.M20200317-1641 (RunaWFE_DeveloperStudio 4.4.0.M20200317-1641) is satisfiable
+
+!ENTRY org.eclipse.equinox.p2.director 0 0 2020-03-17 23:44:11.464
+!MESSAGE Overall install request is satisfiable
+!SUBENTRY 1 org.eclipse.equinox.p2.director 0 0 2020-03-17 23:44:11.464
+!MESSAGE Add request for RunaWFE Developer Studio 4.4.0.M20200317-1641 (RunaWFE_DeveloperStudio 4.4.0.M20200317-1641) is satisfiable
+
+!ENTRY org.eclipse.equinox.p2.director 0 0 2020-03-17 23:44:15.459
+!MESSAGE Overall install request is satisfiable
+!SUBENTRY 1 org.eclipse.equinox.p2.director 0 0 2020-03-17 23:44:15.459
+!MESSAGE Add request for RunaWFE Developer Studio 4.4.0.M20200317-1641 (RunaWFE_DeveloperStudio 4.4.0.M20200317-1641) is satisfiable
+
+!ENTRY org.eclipse.equinox.p2.director 0 0 2020-03-17 23:44:19.174
+!MESSAGE Overall install request is satisfiable
+!SUBENTRY 1 org.eclipse.equinox.p2.director 0 0 2020-03-17 23:44:19.174
+!MESSAGE Add request for RunaWFE Developer Studio 4.4.0.M20200317-1641 (RunaWFE_DeveloperStudio 4.4.0.M20200317-1641) is satisfiable
+
+!ENTRY org.eclipse.equinox.p2.director 0 0 2020-03-17 23:44:23.050
+!MESSAGE Overall install request is satisfiable
+!SUBENTRY 1 org.eclipse.equinox.p2.director 0 0 2020-03-17 23:44:23.050
+!MESSAGE Add request for RunaWFE Developer Studio 4.4.0.M20200317-1641 (RunaWFE_DeveloperStudio 4.4.0.M20200317-1641) is satisfiable

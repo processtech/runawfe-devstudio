@@ -221,13 +221,6 @@ public abstract class ProcessEditorBase extends MultiPageEditorPart implements I
         return outlineViewer;
     }
 
-    public void openPage(int number) {
-        if (getActivePage() != number) {
-            setActivePage(number);
-            setFocus();
-        }
-    }
-
     public void refresh() {
         IFigure figure = getRootFigure();
         figure.revalidate();
@@ -295,7 +288,14 @@ public abstract class ProcessEditorBase extends MultiPageEditorPart implements I
         }
     }
 
-    public IFile getDefinitionFile() {
+    public void openPage(int number) {
+	    if (getActivePage() != number) {
+	        setActivePage(number);
+	        setFocus();
+	    }
+	}
+
+	public IFile getDefinitionFile() {
         return definitionFile;
     }
 

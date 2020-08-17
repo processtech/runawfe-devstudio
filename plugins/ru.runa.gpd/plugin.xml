@@ -2672,6 +2672,14 @@
             <separator name="additions"/>
             <separator name="updates"/>
          </menu>
+         <menu
+               id="edit"
+               label="%label.menu.edit"
+               path="file">
+            <separator
+                  name="additions">
+            </separator>
+         </menu>
          <action
                class="ru.runa.gpd.ui.action.ShowActionsAction"
                id="enableActionsInGraph"

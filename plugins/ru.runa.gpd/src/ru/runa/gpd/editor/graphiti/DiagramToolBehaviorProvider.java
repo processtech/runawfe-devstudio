@@ -33,6 +33,7 @@ import ru.runa.gpd.editor.graphiti.create.CreateDragAndDropElementFeature;
 import ru.runa.gpd.editor.graphiti.create.CreateElementFeature;
 import ru.runa.gpd.editor.graphiti.create.CreateStartNodeFeature;
 import ru.runa.gpd.editor.graphiti.create.CreateSwimlaneFeature;
+import ru.runa.gpd.editor.graphiti.create.CreateTransitionFeature;
 import ru.runa.gpd.editor.graphiti.update.OpenSubProcessFeature;
 import ru.runa.gpd.extension.HandlerArtifact;
 import ru.runa.gpd.extension.HandlerRegistry;
@@ -46,6 +47,7 @@ import ru.runa.gpd.lang.model.Subprocess;
 import ru.runa.gpd.lang.model.Swimlane;
 import ru.runa.gpd.lang.model.TaskState;
 import ru.runa.gpd.lang.model.Transition;
+import ru.runa.gpd.lang.model.bpmn.DottedTransition;
 import ru.runa.gpd.lang.model.bpmn.TextDecorationNode;
 import ru.runa.gpd.settings.PrefConstants;
 
@@ -117,11 +119,18 @@ public class DiagramToolBehaviorProvider extends DefaultToolBehaviorProvider {
         NodeTypeDefinition transitionDefinition = NodeRegistry.getNodeTypeDefinition(Transition.class);
         createTransitionButton.setText(transitionDefinition.getLabel());
         createTransitionButton.setIconId(transitionDefinition.getPaletteIcon());
+        ContextButtonEntry createDottedTransitionButton = new ContextButtonEntry(null, context);
+        NodeTypeDefinition dottedTransitionDefinition = NodeRegistry.getNodeTypeDefinition(DottedTransition.class);
+        createDottedTransitionButton.setText(dottedTransitionDefinition.getLabel());
+        createDottedTransitionButton.setIconId(dottedTransitionDefinition.getPaletteIcon());
         ICreateConnectionFeature[] features = getFeatureProvider().getCreateConnectionFeatures();
         for (ICreateConnectionFeature feature : features) {
-            if (!(feature instanceof CreateDottedTransitionFeature) && feature.isAvailable(createConnectionContext)
+            if (feature.isAvailable(createConnectionContext)
                     && feature.canStartConnection(createConnectionContext)) {
-                createTransitionButton.addDragAndDropFeature(feature);
+                if(feature instanceof CreateTransitionFeature)
+                    createTransitionButton.addDragAndDropFeature(feature);
+                if(feature instanceof CreateDottedTransitionFeature)
+                    createDottedTransitionButton.addDragAndDropFeature(feature);
             }
         }
         //
@@ -165,6 +174,13 @@ public class DiagramToolBehaviorProvider extends DefaultToolBehaviorProvider {
                 data.getDomainSpecificContextButtons().add(createTransitionButton);
             } else {
                 data.getDomainSpecificContextButtons().add(createTransitionButton.getDragAndDropFeatures().size(), createTransitionButton);
+            }
+        }
+        if (createDottedTransitionButton.getDragAndDropFeatures().size() > 0) {
+            if (expandContextButtonPad) {
+                data.getDomainSpecificContextButtons().add(createDottedTransitionButton);
+            } else {
+                data.getDomainSpecificContextButtons().add(createDottedTransitionButton.getDragAndDropFeatures().size(), createDottedTransitionButton);
             }
         }
         return data;

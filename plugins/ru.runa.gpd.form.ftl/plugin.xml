@@ -84,7 +84,7 @@
       <type
             class="ru.runa.gpd.formeditor.ftl.parameter.VariableComboParameter"
             validator="ru.runa.gpd.formeditor.ftl.validation.VariableParameterTypeValidator"
-            id="varcombo">               
+            id="varcombo">
       </type>
       <type
             class="ru.runa.gpd.formeditor.ftl.parameter.RichComboParameter"
@@ -147,7 +147,7 @@
             id="projections">
       </type>
    </extension>
-   
+
    <extension
          point="org.eclipse.core.runtime.preferences">
       <initializer class="ru.runa.gpd.htmleditor.HTMLPreferenceInitializer"/>
@@ -174,13 +174,13 @@
             category="ru.runa.gpd.htmleditor"
             class="ru.runa.gpd.htmleditor.views.ImageView"
             name="%plugin.views.image"
-            id="ru.runa.gpd.htmleditor.views.ImageView"/>            
+            id="ru.runa.gpd.htmleditor.views.ImageView"/>
       <view
             category="ru.runa.gpd.view.category"
             class="ru.runa.gpd.formeditor.ftl.ui.FormComponentsView"
             icon="icons/components.gif"
             id="ru.runa.gpd.formeditor.ftl.formComponentsView"
-            name="%label.view.formComponents"/>         
+            name="%label.view.formComponents"/>
    </extension>
    <extension
          point="org.eclipse.ui.actionSets">
@@ -209,7 +209,7 @@
             name="JavaScript"
             id="ru.runa.gpd.htmleditor.templateContextType.javascript"/>
    </extension>
-      
+
    <extension
          point="ru.runa.gpd.formtype">
       <element
@@ -593,7 +593,7 @@
                variableAccess="READ">
          </param>
          <param
-               
+
                name="%Param.RelationInversed"
                type="combo"
                variableAccess="NONE">
@@ -1275,6 +1275,45 @@
                variableAccess="WRITE">
          </param>
       </component>
+      <component
+              enabled="true"
+              id="SingleSelectFromUserTypeList"
+              name="%Method.SingleSelectFromUserTypeList"
+              order="-82">
+         <param
+                 name="%Param.Variable"
+                 optional="false"
+                 type="usertypevarlistcombo"
+                 variableAccess="WRITE"
+                 variableTypeFilter="java.util.List">
+         </param>
+         <param
+                 name="%Param.InputData"
+                 optional="false"
+                 type="usertypevarlistcombo"
+                 variableAccess="READ"
+                 variableTypeFilter="java.util.List">
+         </param>
+         <param
+                 name="%Param.DisplayFormat"
+                 type="combo"
+                 variableAccess="NONE">
+            <paramValue
+                    name="%Format.Variable.Component"
+                    value="true">
+            </paramValue>
+            <paramValue
+                    name="%Format.Variable.Output"
+                    value="false">
+            </paramValue>
+         </param>
+         <param
+                 name="%Param.Attributes"
+                 optional="true"
+                 type="usertypeattributelist"
+                 variableAccess="NONE">
+         </param>
+      </component>
    </extension>
-    
+
 </plugin>

@@ -42,6 +42,22 @@
         point="org.eclipse.ui.popupMenus">
      <objectContribution
            adaptable="false"
+           id="bpmn.transition.handlers"
+           objectClass="ru.runa.gpd.lang.model.Transition">
+        <filter
+              name="language"
+              value="bpmn">
+        </filter>
+        <action
+              class="ru.runa.gpd.lang.action.RenameTransitionDelegate"
+              id="graph.actions.rename.transition"
+              label="%button.rename"
+              menubarPath="additions"
+              style="push">
+        </action>
+     </objectContribution>
+     <objectContribution
+           adaptable="false"
            id="jpdl.transition.handlers"
            objectClass="ru.runa.gpd.lang.model.Transition">
         <filter
@@ -54,6 +70,13 @@
              label="%label.action.actions"
              menubarPath="additions"
              style="pulldown">
+       </action>
+       <action
+             class="ru.runa.gpd.lang.action.RenameTransitionDelegate"
+             id="graph.actions.rename.transition"
+             label="%button.rename"
+             menubarPath="additions"
+             style="push">
        </action>
     </objectContribution>
     <objectContribution

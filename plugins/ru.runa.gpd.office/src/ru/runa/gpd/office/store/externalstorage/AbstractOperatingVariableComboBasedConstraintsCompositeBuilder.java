@@ -26,7 +26,7 @@ abstract class AbstractOperatingVariableComboBasedConstraintsCompositeBuilder ex
     protected void addCombo() {
         combo = new Combo(getParent(), SWT.READ_ONLY);
         variableNamesByVariableTypeName(variableTypeName).forEach(combo::add);
-
+        
         combo.addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> {
             final String text = combo.getText();
             if (Strings.isNullOrEmpty(text)) {

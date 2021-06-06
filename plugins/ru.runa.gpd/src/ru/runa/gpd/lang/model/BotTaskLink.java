@@ -1,9 +1,21 @@
 package ru.runa.gpd.lang.model;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import javax.print.Doc;
+
+import org.dom4j.Document;
+import org.dom4j.Element;
+import org.eclipse.core.resources.IFile;
+
+import ru.runa.gpd.BotCache;
 import ru.runa.gpd.Localization;
+import ru.runa.gpd.PluginLogger;
+import ru.runa.gpd.ProcessCache;
 import ru.runa.gpd.extension.HandlerArtifact;
+import ru.runa.gpd.util.BotTaskUtils;
+import ru.runa.gpd.util.XmlUtil;
 
 import com.google.common.collect.Lists;
 
@@ -19,8 +31,12 @@ public class BotTaskLink implements Delegable {
     private String botTaskName;
     private String delegationClassName;
     private String delegationConfiguration = "";
+    private String botName;
     private TaskState taskState;
-
+    private String Filename;
+    private final String xmlHeader = "<?xml version=\"1.0\" encoding=\"UTF-8\"?> \n \n";
+    private final String  InternalStorageClassName = "ru.runa.wfe.office.storage.handler.InternalStorageHandler";
+   
     /**
      * linked {@link BotTask} name
      */
@@ -70,12 +86,51 @@ public class BotTaskLink implements Delegable {
 
     @Override
     public List<String> getVariableNames(boolean includeSwimlanes, String... typeClassNameFilters) {
-        if (taskState != null) {
-            return taskState.getProcessDefinition().getVariableNames(includeSwimlanes, typeClassNameFilters);
+        if (taskState == null) {
+        	return Lists.newArrayList();
         }
-        return Lists.newArrayList();
+//        if (delegationClassName.equals(InternalStorageClassName)&&checkFormat(typeClassNameFilters) ) {
+//        	List<String> variablesNames = new ArrayList<String>();
+//        	List<Variable>  typeAttributes = getGlobalSection();
+//        	if (typeAttributes == null) {
+//        		return taskState.getProcessDefinition().getVariableNames(includeSwimlanes, typeClassNameFilters);
+//        	}
+//        	for(Variable variable : taskState.getProcessDefinition().getVariables(true, includeSwimlanes, typeClassNameFilters)) {
+//        			if(variable.getUserType().getAttributes().equals(typeAttributes)) {
+//        				variablesNames.add(variable.getName());
+//        			}
+//        	}
+//        	return variablesNames;
+//        }
+        return taskState.getProcessDefinition().getVariableNames(includeSwimlanes, typeClassNameFilters);
+        
     }
-    
+//    public List<Variable> getGlobalSection() {
+//    	
+//    	BotTask botTask = BotCache.getBotTask(taskState.getSwimlaneBotName(), botTaskName);
+//    	
+//    	String xmmText = botTask.getDelegationConfiguration();
+//    	if(!XmlUtil.isXml(xmmText)) {
+//    		return null;
+//    	}
+//    	IFile globalSection =  botTask.getGlobalSectionFile();
+//    	Document doc = XmlUtil.parseWithoutValidation(xmmText);
+//    	Element root = doc.getRootElement();
+//    	String typeName = root.element("binding").attributeValue("variable");
+//    	Variable variable = ProcessCache.getProcessDefinition(globalSection).getVariableByName(typeName);
+//		if (variable.getUserType().equals(null)) {
+//			return variable.getUserType().getAttributes() ;
+//		}
+//		return null;
+//    }
+    private boolean checkFormat(String... typeClassNameFilters) {
+    	for(String format : typeClassNameFilters) {
+    		if("ru.runa.wfe.var.UserTypeMap".equals(format)) {
+    			return true;
+    		}
+    	}    	
+    	return false;
+    }
     public BotTaskLink getCopy(TaskState taskState) {
         BotTaskLink copy = new BotTaskLink();
         copy.setBotTaskName(botTaskName);
@@ -89,4 +144,5 @@ public class BotTaskLink implements Delegable {
     public String toString() {
         return Localization.getString("BotTaskLink.description", taskState, botTaskName);
     }
+   
 }

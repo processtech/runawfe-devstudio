@@ -23,11 +23,11 @@ import ru.runa.gpd.ui.custom.LoggingHyperlinkAdapter;
 import ru.runa.gpd.ui.custom.SwtUtils;
 
 public class PredicateComposite extends Composite {
-    private final StorageConstraintsModel constraintsModel;
-    private final VariableProvider variableProvider;
-    private final VariableUserType variableUserType;
+	protected final StorageConstraintsModel constraintsModel;
+    protected final VariableProvider variableProvider;
+    protected final VariableUserType variableUserType;
 
-    private final Group group;
+    protected final Group group;
     private final List<Label> labels = new ArrayList<>(5);
 
     private final PredicateTree predicateTree = new PredicateTree();
@@ -93,7 +93,7 @@ public class PredicateComposite extends Composite {
         }
     }
 
-    private void buildVariablePredicate(OnConstructedPredicateDelegate<Variable, Variable> predicate, int index) {
+    public void buildVariablePredicate(OnConstructedPredicateDelegate<Variable, Variable> predicate, int index) {
         final Combo subjectCombo = new Combo(group, SWT.READ_ONLY);
         final Combo predicateOperationTypeCombo = new Combo(group, SWT.READ_ONLY);
         final Combo compareWithCombo = new Combo(group, SWT.READ_ONLY);
@@ -149,7 +149,7 @@ public class PredicateComposite extends Composite {
         constraintsModel.setQueryString(predicateTree.head() != null ? predicateTree.head().toString().trim() : "");
     }
 
-    private void onDeletePredicate(int index) {
+    public void onDeletePredicate(int index) {
         predicateTree.removeVariablePredicateBy(index);
         onPredicateConstructed();
 

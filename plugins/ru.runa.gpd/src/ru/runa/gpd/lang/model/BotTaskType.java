@@ -15,5 +15,9 @@ public enum BotTaskType {
     /**
      * This bot task has a dynamic configuration (in server there will be changes to real variables according to task binding parameters)
      */
-    EXTENDED
+    EXTENDED,
+    /**
+     * This bot task has a dynamic configuration, but real variables from Global Section
+     */
+    GLOBALSECTION
 }

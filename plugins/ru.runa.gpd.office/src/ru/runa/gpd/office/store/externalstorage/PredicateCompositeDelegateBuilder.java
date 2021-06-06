@@ -4,6 +4,10 @@ import com.google.common.base.Strings;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.forms.events.HyperlinkEvent;
+
+import ru.runa.gpd.Localization;
+import ru.runa.gpd.PluginLogger;
+import ru.runa.gpd.lang.model.Delegable;
 import ru.runa.gpd.office.Messages;
 import ru.runa.gpd.office.store.StorageConstraintsModel;
 import ru.runa.gpd.office.store.externalstorage.predicate.PredicateComposite;
@@ -11,15 +15,16 @@ import ru.runa.gpd.ui.custom.LoggingHyperlinkAdapter;
 import ru.runa.gpd.ui.custom.SwtUtils;
 
 public class PredicateCompositeDelegateBuilder implements ConstraintsCompositeBuilder {
-    private final Composite parent;
-    private final int style;
-    private final StorageConstraintsModel constraintsModel;
-    private final VariableProvider variableProvider;
-    private final ConstraintsCompositeBuilder delegate;
+	protected final Composite parent;
+    protected final int style;
+    protected final StorageConstraintsModel constraintsModel;
+    protected final VariableProvider variableProvider;
+    protected final ConstraintsCompositeBuilder delegate;
+    
 
-    private PredicateComposite predicateComposite;
-    private String variableTypeName;
-
+    protected PredicateComposite predicateComposite;
+    protected String variableTypeName;
+    
     public PredicateCompositeDelegateBuilder(Composite parent, int style, StorageConstraintsModel constraintsModel, VariableProvider variableProvider,
             String variableTypeName, ConstraintsCompositeBuilder delegate) {
         this.parent = parent;

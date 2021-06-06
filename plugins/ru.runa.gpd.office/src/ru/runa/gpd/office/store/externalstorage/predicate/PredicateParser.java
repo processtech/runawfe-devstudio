@@ -23,18 +23,19 @@ public class PredicateParser {
     public ConstraintsPredicate<?, ?> parse() {
         final StringTokenizer st = new StringTokenizer(predicateString);
         ConstraintsPredicate<?, ?> result = null;
-
+        String rightField =null;
         while (st.hasMoreTokens()) {
             String token = st.nextToken();
-
+            
             if (token.startsWith("[") && token.endsWith("]")) {
                 token = token.replace(UNICODE_CHARACTER_OVERLINE, ' ');
                 final String userTypeFieldName = token.substring(1, token.length() - 1);
                 final Variable userTypeField = getUserTypeFieldByName(userTypeFieldName)
                         .orElseThrow(() -> new VariableDoesNotExistException(userTypeFieldName));
-
+                rightField = userTypeFieldName;
                 if (result != null && result instanceof VariablePredicate) {
                     ((VariablePredicate) result).setLeft(userTypeField);
+                    
                 } else if (result != null && result instanceof ExpressionPredicate) {
                     VariablePredicate right = ((ExpressionPredicate<?>) result).getRight();
                     if (right != null) {
@@ -46,6 +47,7 @@ public class PredicateParser {
                     }
                 } else {
                     result = new VariablePredicate(userTypeField, null, null);
+                    
                 }
             } else if (PredicateOperationType.codes().contains(token.toLowerCase())) {
                 PredicateOperationType type = PredicateOperationType.byCode(token.toLowerCase()).get();
@@ -64,8 +66,8 @@ public class PredicateParser {
                 }
             } else if (token.startsWith("@")) {
                 final String variableName = token.substring(1);
-                final Variable comparingWithVariable = variableProvider.variableByScriptingName(variableName)
-                        .orElseThrow(() -> new VariableDoesNotExistException(variableName));
+                final Variable comparingWithVariable = variableProvider.variableByScriptingName(variableName).orElse(newVariable( variableName, rightField ));
+                        //.orElseThrow(() -> new VariableDoesNotExistException(variableName));
 
                 if (result != null && result instanceof VariablePredicate) {
                     ((VariablePredicate) result).setRight(comparingWithVariable);
@@ -77,6 +79,17 @@ public class PredicateParser {
         }
 
         return result;
+    }
+    
+    private Variable newVariable(String variableName, String typeField) {
+    	if(typeField.equals("")) {
+    		return null;
+    	}
+    	Variable newVariable = new Variable();
+    	newVariable.setName(variableName);
+    	newVariable.setScriptingName(variableName);
+    	newVariable.setFormat(getUserTypeFieldByName(typeField).get().getFormat());
+    	return newVariable;
     }
 
     private Optional<Variable> getUserTypeFieldByName(String name) {

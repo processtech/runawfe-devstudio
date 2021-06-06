@@ -54,7 +54,7 @@ public class BotTaskUtils {
     }
 
     public static String createBotTaskConfiguration(BotTask botTask) {
-        if (botTask.getType() == BotTaskType.EXTENDED) {
+        if (botTask.getType() == BotTaskType.EXTENDED || botTask.getType() == BotTaskType.GLOBALSECTION) {
             Document document = DocumentHelper.createDocument();
             Element root = document.addElement(EXTENDED_ELEMENT);
             Element parametersElement = root.addElement(PARAMETERS_ELEMENT);

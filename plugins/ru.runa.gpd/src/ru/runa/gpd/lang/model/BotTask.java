@@ -29,6 +29,7 @@ public class BotTask implements Delegable, Comparable<BotTask> {
     private String delegationConfiguration = "";
     private ParamDefConfig paramDefConfig;
     private final List<String> filesToSave;
+    private IFile globalSectionFile = null;
 
     public BotTask(String station, String bot, String name) {
         this.id = String.format("%s/%s/%s", station, bot, name);
@@ -86,6 +87,14 @@ public class BotTask implements Delegable, Comparable<BotTask> {
             return true;
         }
         return XmlUtil.isXml(delegationConfiguration);
+    }
+    
+    public IFile getGlobalSectionFile() {
+        return globalSectionFile;
+    }
+
+    public void setGlobalSectionFile(IFile GSDFile) {
+        this.globalSectionFile = GSDFile;
     }
 
     /**
@@ -179,4 +188,5 @@ public class BotTask implements Delegable, Comparable<BotTask> {
             PluginLogger.logError(e);
         }
     }
+ 	
 }

@@ -174,5 +174,27 @@ public class VariablesXmlContentProvider extends AuxContentProvider {
         }
         return element;
     }
-
+    
+    public Element saveBotType(Element root, VariableUserType mainGlobalSection) {
+    	Element typeElement = root.addElement(USER_TYPE);
+    	root = root.element(USER_TYPE);
+        typeElement.addAttribute(NAME, mainGlobalSection.getName());        
+        typeElement.addAttribute(VariableUserType.PROPERTY_STORE_IN_EXTERNAL_STORAGE, Boolean.TRUE.toString());        
+        for (Variable variable : mainGlobalSection.getAttributes()) {
+            writeVariable(typeElement, variable);
+        }
+        return root;
+    }
+    
+    public VariableUserType parseBotType (Element typeElement) {
+    	VariableUserType type = new VariableUserType();
+    	type.setName(typeElement.attributeValue(NAME));
+        List<Element> attributeElements = typeElement.elements(VARIABLE);
+        for (Element attributeElement : attributeElements) {
+            Variable variable = parse(attributeElement, null);
+            type.addAttribute(variable);
+        }
+        return type;
+    }
+    
 }

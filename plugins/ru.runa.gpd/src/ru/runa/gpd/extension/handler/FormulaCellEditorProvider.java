@@ -70,7 +70,7 @@ public class FormulaCellEditorProvider extends DelegableProvider {
         return delegable.getDelegationConfiguration().replaceAll(Pattern.quote(currentVariableName), Matcher.quoteReplacement(previewVariableName));
     }
 
-    private static class ConfigurationDialog extends DelegableConfigurationDialog {
+    public static class ConfigurationDialog extends DelegableConfigurationDialog {
         private final List<String> variableNames;
 
         public ConfigurationDialog(String initialValue, List<String> variableNames) {

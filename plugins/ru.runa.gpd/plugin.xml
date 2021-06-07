@@ -508,7 +508,18 @@
        <action
              class="ru.runa.gpd.lang.action.OpenDelegableConfigurationDelegate"
              id="delegable.2editConfiguration"
-             label="%label.action.editConfiguration" />
+             label="%label.action.editConfiguration"/>
+    </objectContribution>
+    <objectContribution
+          adaptable="false"
+          id="businessRule.compactview"
+          objectClass="ru.runa.gpd.lang.model.bpmn.BusinessRule">
+       <action
+             class="ru.runa.gpd.lang.action.CompactViewFeatureDelegate"
+             id="feature.compactView"
+             label="%label.action.feature.compactView"
+             menubarPath="features/sp1">
+       </action>
     </objectContribution>
     <objectContribution
           adaptable="false"
@@ -1187,6 +1198,24 @@
          </graphiti>
       </element>
       <element
+            bpmn="businessRuleTask"
+            enabledInRegulationsByDefault="false"
+            icon="business-rule.png"
+            label="%label.element.businessRule"
+            model="ru.runa.gpd.lang.model.bpmn.BusinessRule"
+            type="node">
+         <graphiti
+               add="ru.runa.gpd.editor.graphiti.add.AddBusinessRuleNodeFeature"
+               create="ru.runa.gpd.editor.graphiti.create.CreateElementFeature"
+               doubleClick="ru.runa.gpd.editor.graphiti.update.DoubleClickDelegableFeature"
+               fixedSize="false"
+               height="10"
+               layout="ru.runa.gpd.editor.graphiti.layout.LayoutStateNodeFeature"
+               update="ru.runa.gpd.editor.graphiti.update.UpdateStateNodeFeature"
+               width="15">
+         </graphiti>
+      </element>
+      <element
             bpmn="actionHandler"
             hasPreferencePage="false"
             icon="action.png"
@@ -1612,6 +1641,16 @@
             className="ru.runa.wfe.extension.decision.GroovyDecisionHandler"
             enabled="true"
             label="%ru.runa.wfe.extension.decision.GroovyDecisionHandler" />
+      <handler
+            actionHandler="true"
+            assignmentHandler="false"
+            botTaskHandler="false"
+            cellEditorProvider="ru.runa.gpd.extension.businessRule.BusinessRuleProvider"
+            className="ru.runa.wfe.extension.handler.var.BusinessRuleHandler"
+            decisionHandler="false"
+            enabled="false"
+            label="%label.element.businessRule">
+      </handler>
       <handler
             actionHandler="true"
             assignmentHandler="false"

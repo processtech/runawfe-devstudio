@@ -11,7 +11,7 @@ import ru.runa.gpd.util.VariableUtils;
 
 import com.google.common.collect.Sets;
 
-public class GroovyDecisionModel {
+public class GroovyDecisionModel implements GroovyModel {
     private final List<IfExpr> ifs = new ArrayList<IfExpr>();
     private static Pattern IF_PATTERN = Pattern.compile("if \\((.*)\\)");
     private static Pattern RETURN_PATTERN = Pattern.compile("return \"([^\"]*)\";");

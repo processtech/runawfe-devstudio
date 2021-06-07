@@ -7,7 +7,7 @@ import ru.runa.gpd.lang.model.Delegable;
 import ru.runa.gpd.ui.dialog.ChooseHandlerClassDialog;
 
 public class ChooseDelegableHandlerAction extends BaseModelActionDelegate {
-    
+
     @Override
     public void run(IAction action) {
         Delegable delegable = (Delegable) getSelection();
